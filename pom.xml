@@ -18,6 +18,7 @@
 	<description>Test task for Pumb</description>
 	<properties>
 		<java.version>17</java.version>
+		<lombok.version>1.18.24</lombok.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 	</properties>
 
@@ -53,7 +54,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

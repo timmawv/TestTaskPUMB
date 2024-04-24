@@ -3,6 +3,8 @@ spring:
     name: TestTaskPUMB
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://postgres_db:5432/animals_db
+    url: jdbc:postgresql://localhost:5432/animals_db
     username: postgres
     password: postgres
+  liquibase:
+    change-log: db/changelog/main-changelog.xml
