@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 commands.txt
 animals.csv
+src/main/java/avlyakulov/timur/TestTaskPUMB/test
 
 ### STS ###
 .apt_generated

@@ -15,7 +15,7 @@ https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
         </preConditions>
 
         <createTable tableName="animals">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(255)">
@@ -27,10 +27,13 @@ https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
             <column name="sex" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="weight" type="bigint">
+            <column name="weight" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="cost" type="bigint">
+            <column name="cost" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="int">
                 <constraints nullable="false"/>
             </column>
         </createTable>

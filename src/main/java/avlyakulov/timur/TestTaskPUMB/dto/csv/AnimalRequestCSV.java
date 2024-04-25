@@ -1,16 +1,12 @@
-package avlyakulov.timur.TestTaskPUMB.dto;
+package avlyakulov.timur.TestTaskPUMB.dto.csv;
 
 import avlyakulov.timur.TestTaskPUMB.enums.AnimalSex;
 import com.opencsv.bean.CsvBindByName;
 import lombok.*;
 
-
 @Getter
 @Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class AnimalRequest {
+public class AnimalRequestCSV {
 
     @CsvBindByName(column = "Name")
     private String name;
@@ -19,7 +15,7 @@ public class AnimalRequest {
     private String type;
 
     @CsvBindByName(column = "Sex")
-    private AnimalSex sex;
+    private String sex;
 
     @CsvBindByName(column = "Weight")
     private String weight;
