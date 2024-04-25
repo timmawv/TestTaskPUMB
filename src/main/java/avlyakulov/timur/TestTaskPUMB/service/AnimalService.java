@@ -1,7 +1,10 @@
 package avlyakulov.timur.TestTaskPUMB.service;
 
-import org.springframework.stereotype.Service;
+import avlyakulov.timur.TestTaskPUMB.dto.AnimalRequest;
+import org.springframework.web.multipart.MultipartFile;
 
-@Service
-public class AnimalService {
+import java.util.List;
+
+public interface AnimalService {
+    void mapFileToAnimal(MultipartFile file);
 }
