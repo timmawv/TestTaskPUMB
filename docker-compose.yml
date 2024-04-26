@@ -4,7 +4,7 @@ services:
   postgres_db:
     image: postgres:14-alpine
     volumes:
-      - animals_uploader:/var/lib/postgresql/data
+      - animals_uploader_volume:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: animals_db
       PGUSER: postgres
@@ -17,12 +17,10 @@ services:
       timeout: 5s
       retries: 3
 
-  weather:
+  animals_upload:
     image: animals_uploader
     environment:
       DB_URL: jdbc:postgresql://postgres_db:5432/animals_db
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
     ports:
       - "8080:8080"
     depends_on:
@@ -30,4 +28,4 @@ services:
         condition: service_healthy
 
 volumes:
-  animals_uploader:
+  animals_uploader_volume:
