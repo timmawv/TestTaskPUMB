@@ -23,8 +23,7 @@ public class Animal {
     private String type;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private AnimalSex sex;
+    private String sex;
 
     @Column(nullable = false)
     private Integer weight;

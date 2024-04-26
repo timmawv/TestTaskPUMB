@@ -4,7 +4,6 @@ import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
 import avlyakulov.timur.TestTaskPUMB.dto.csv.AnimalRequestCSV;
 import avlyakulov.timur.TestTaskPUMB.dto.xml.AnimalRequestXML;
 import avlyakulov.timur.TestTaskPUMB.dto.xml.AnimalXML;
-import avlyakulov.timur.TestTaskPUMB.exception.ApiMessage;
 import avlyakulov.timur.TestTaskPUMB.exception.FileIsEmptyException;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
@@ -16,10 +15,10 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,18 +29,20 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Setter
 public class AnimalServiceImpl implements AnimalService {
 
     private String fileIsEmpty = "Your file is empty. Please send valid files with values.";
 
     private String fileNotSupported = "Our application supports only .csv and .xml. Please use these file types.";
 
-    private final AnimalMapper animalMapper;
+    private final String csvType = "text/csv";
+
+    private final String xmlType = "application/xml";
+
+    private  AnimalMapper animalMapper;
 
     private final AnimalRepository animalRepository;
-
-    private final String csvType = "text/csv";
-    private final String xmlType = "application/xml";
 
     @Autowired
     public AnimalServiceImpl(AnimalMapper animalMapper, AnimalRepository animalRepository) {
@@ -67,24 +68,23 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     @Override
-    public void mapFileToAnimal(MultipartFile file) {
+    public void parseFileToAnimalEntities(MultipartFile file) {
         validateFile(file);
         String contentType = file.getContentType();
         switch (contentType) {
-            case (csvType) -> parseCsvFile(file);
-            case (xmlType) -> parseXmlFile(file);
+            case (csvType) -> parseCsvFileAndSaveAnimals(file);
+            case (xmlType) -> parseXmlFileAndSaveAnimals(file);
         }
-
     }
 
-    private void parseCsvFile(MultipartFile file) {
+    private void parseCsvFileAndSaveAnimals(MultipartFile file) {
         List<AnimalRequestCSV> animalRequestCSV = parseToListAnimalCSVFromFile(file);
         List<Animal> animals = animalMapper.mapListAnimalCSVtoListAnimal(animalRequestCSV);
         setCategoryToAnimal(animals);
         animalRepository.saveAll(animals);
     }
 
-    private void parseXmlFile(MultipartFile file) {
+    private void parseXmlFileAndSaveAnimals(MultipartFile file) {
         List<AnimalXML> animalXML = parseToListAnimalXMLFromFile(file);
         List<Animal> animals = animalMapper.mapListAnimalXMLtoListAnimal(animalXML);
         setCategoryToAnimal(animals);
@@ -128,8 +128,8 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     private boolean isTypeFileValid(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
-        return (fileName != null && (fileName.endsWith(".csv") || fileName.endsWith(".xml")));
+        String fileType = file.getContentType();
+        return (fileType.equals(csvType) || fileType.equals(xmlType));
     }
 
     private boolean isAnyParameterNull(String... parameters) {

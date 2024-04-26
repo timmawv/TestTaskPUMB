@@ -1,11 +1,15 @@
 package avlyakulov.timur.TestTaskPUMB.dto.csv;
 
-import avlyakulov.timur.TestTaskPUMB.enums.AnimalSex;
 import com.opencsv.bean.CsvBindByName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AnimalRequestCSV {
 
     @CsvBindByName(column = "Name")

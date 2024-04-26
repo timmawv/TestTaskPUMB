@@ -29,7 +29,7 @@ public class AnimalController {
 
     private String fileUploaded = "File was upload and animals were saved.";
 
-    private String invalidFields = "One or more params in url are invalid. Please enter valid params.";
+    private String invalidFields = "One or more params in url are invalid. Please enter valid params. ";
 
     AnimalService animalService;
 
@@ -38,7 +38,7 @@ public class AnimalController {
         this.animalService = animalService;
     }
 
-    @Operation(summary = "Get list of animals", description = "Returns a list of animals sorted or not. if you do not specify the sort type, the default is ASC")
+    @Operation(summary = "Get list of animals", description = "Returns a list of animals sorted or not. If you do not specify the sort type, the default is ASC")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -58,7 +58,7 @@ public class AnimalController {
     })
     @GetMapping
     public ResponseEntity<?> getAnimals(@RequestParam(name = "sort_by", required = false) @Parameter(name = "sort_by", description = "field by which animals will be sorted", example = "name") Optional<String> fieldToSort,
-                                        @RequestParam(name = "type_sort", required = false) @Parameter(name = "type_sort", description = "type of sorting supports only asc, desc", example = "desc") Optional<String> typeSort) {
+                                        @RequestParam(name = "type_sort", required = false) @Parameter(name = "type_sort", description = "type of sorting supports only asc, desc", example = "asc") Optional<String> typeSort) {
         if (fieldToSort.isPresent() && typeSort.isPresent())
             try {
                 return ResponseEntity.ok(animalService.getAnimals(fieldToSort.get(), typeSort.get()));
@@ -96,7 +96,7 @@ public class AnimalController {
             return ResponseEntity.badRequest().body(new ApiMessage(fileNotAdded));
 
         try {
-            animalService.mapFileToAnimal(file.get());
+            animalService.parseFileToAnimalEntities(file.get());
         } catch (FileNotSupportedException | FileIsEmptyException e) {
             return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
         }

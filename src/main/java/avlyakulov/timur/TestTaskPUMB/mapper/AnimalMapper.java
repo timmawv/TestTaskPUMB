@@ -17,8 +17,4 @@ public interface AnimalMapper {
     List<Animal> mapListAnimalXMLtoListAnimal(List<AnimalXML> listAnimalXML);
 
     List<AnimalResponse> mapListAnimalToAnimalResponse(List<Animal> listAnimal);
-
-    default AnimalSex mapStringToEnum(String sex) {
-        return AnimalSex.valueOf(sex.toUpperCase());
-    }
 }
