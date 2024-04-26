@@ -1,8 +1,6 @@
 package avlyakulov.timur.TestTaskPUMB.controller;
 
-import avlyakulov.timur.TestTaskPUMB.exception.ApiMessage;
-import avlyakulov.timur.TestTaskPUMB.exception.FileIsEmptyException;
-import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
+import avlyakulov.timur.TestTaskPUMB.exception.*;
 import avlyakulov.timur.TestTaskPUMB.service.AnimalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,12 +10,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.query.sqm.PathElementException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Optional;
 
 @Slf4j
@@ -29,7 +28,7 @@ public class AnimalController {
 
     private String fileUploaded = "File was upload and animals were saved.";
 
-    private String invalidFields = "One or more params in url are invalid. Please enter valid params. ";
+    private String sortByMessageException = "Your parameter sort_by is incorrect. Please enter valid parameter.";
 
     AnimalService animalService;
 
@@ -38,7 +37,7 @@ public class AnimalController {
         this.animalService = animalService;
     }
 
-    @Operation(summary = "Get list of animals", description = "Returns a list of animals sorted or not. If you do not specify the sort type, the default is ASC")
+    @Operation(summary = "Get list of animals", description = "Returns a list of animals that filter by field or not, sorted by field or not. If you do not specify the sort type, the default is ASC")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -57,23 +56,15 @@ public class AnimalController {
                     })
     })
     @GetMapping
-    public ResponseEntity<?> getAnimals(@RequestParam(name = "sort_by", required = false) @Parameter(name = "sort_by", description = "field by which animals will be sorted", example = "name") Optional<String> fieldToSort,
-                                        @RequestParam(name = "type_sort", required = false) @Parameter(name = "type_sort", description = "type of sorting supports only asc, desc", example = "asc") Optional<String> typeSort) {
-        if (fieldToSort.isPresent() && typeSort.isPresent())
-            try {
-                return ResponseEntity.ok(animalService.getAnimals(fieldToSort.get(), typeSort.get()));
-            } catch (IllegalArgumentException | PropertyReferenceException e) {
-                log.info("user tried to get animals with invalid params {}", e.getMessage());
-                return ResponseEntity.badRequest().body(new ApiMessage(invalidFields.concat(e.getMessage())));
-            }
-        if (fieldToSort.isPresent())
-            try {
-                return ResponseEntity.ok(animalService.getAnimals(fieldToSort.get()));
-            } catch (PropertyReferenceException e) {
-                log.info("user tried to get animals and sort by invalid field {}", e.getMessage());
-                return ResponseEntity.badRequest().body(new ApiMessage(invalidFields.concat(e.getMessage())));
-            }
-        return ResponseEntity.ok(animalService.getAnimals());
+    public ResponseEntity<?> getAnimals(@RequestParam(name = "sort_by", required = false) @Parameter(name = "sort_by", description = "field by which animals will be sorted", example = "name") String fieldToSort,
+                                        @RequestParam(name = "type_sort", required = false) @Parameter(name = "type_sort", description = "type of sorting supports only asc, desc", example = "asc") String typeSort,
+                                        @RequestParam(name = "filter_field", required = false) @Parameter(name = "filter_field", description = "filter field contains type, category, sex", example = "type") String filterField,
+                                        @RequestParam(name = "filter_value", required = false) @Parameter(name = "filter_value", description = "filter value for filtering", example = "cat") String filterValue) {
+        try {
+            return ResponseEntity.ok(animalService.getAnimals(filterField, filterValue, fieldToSort, typeSort));
+        } catch (FieldSortException | TypeSortException | FilterFieldException | CategoryNumberException e) {
+            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
+        }
     }
 
     @Operation(summary = "Upload file to server", description = "Upload only .xml or .csv files to server.")

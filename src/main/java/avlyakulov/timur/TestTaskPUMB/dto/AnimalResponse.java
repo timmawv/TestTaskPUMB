@@ -1,6 +1,5 @@
 package avlyakulov.timur.TestTaskPUMB.dto;
 
-import avlyakulov.timur.TestTaskPUMB.enums.AnimalSex;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +11,7 @@ public class AnimalResponse {
 
     private String type;
 
-    private AnimalSex sex;
+    private String sex;
 
     private Integer weight;
 

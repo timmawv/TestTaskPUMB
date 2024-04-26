@@ -1,7 +1,6 @@
 package avlyakulov.timur.TestTaskPUMB.model;
 
 
-import avlyakulov.timur.TestTaskPUMB.enums.AnimalSex;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

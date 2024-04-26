@@ -1,4 +1,4 @@
-package avlyakulov.timur.TestTaskPUMB.service.impl;
+package avlyakulov.timur.TestTaskPUMB.service;
 
 import avlyakulov.timur.TestTaskPUMB.dto.csv.AnimalRequestCSV;
 import avlyakulov.timur.TestTaskPUMB.dto.xml.AnimalXML;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class AnimalServiceImplTest {
+class AnimalServiceTest {
 
     @Mock
     private AnimalRepository animalRepository;
@@ -36,7 +36,7 @@ class AnimalServiceImplTest {
     ArgumentCaptor<List<Animal>> animalCaptor;
 
     @InjectMocks
-    private AnimalServiceImpl animalService;
+    private AnimalService animalService;
 
     private final String csvFileContent = """
             Name,Type,Sex,Weight,Cost
