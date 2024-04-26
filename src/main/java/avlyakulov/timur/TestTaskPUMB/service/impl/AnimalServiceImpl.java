@@ -4,6 +4,9 @@ import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
 import avlyakulov.timur.TestTaskPUMB.dto.csv.AnimalRequestCSV;
 import avlyakulov.timur.TestTaskPUMB.dto.xml.AnimalRequestXML;
 import avlyakulov.timur.TestTaskPUMB.dto.xml.AnimalXML;
+import avlyakulov.timur.TestTaskPUMB.exception.ApiMessage;
+import avlyakulov.timur.TestTaskPUMB.exception.FileIsEmptyException;
+import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
@@ -16,6 +19,7 @@ import jakarta.xml.bind.Unmarshaller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +31,10 @@ import java.util.List;
 @Slf4j
 @Service
 public class AnimalServiceImpl implements AnimalService {
+
+    private String fileIsEmpty = "Your file is empty. Please send valid files with values.";
+
+    private String fileNotSupported = "Our application supports only .csv and .xml. Please use these file types.";
 
     private final AnimalMapper animalMapper;
 
@@ -60,6 +68,7 @@ public class AnimalServiceImpl implements AnimalService {
 
     @Override
     public void mapFileToAnimal(MultipartFile file) {
+        validateFile(file);
         String contentType = file.getContentType();
         switch (contentType) {
             case (csvType) -> parseCsvFile(file);
@@ -110,6 +119,18 @@ public class AnimalServiceImpl implements AnimalService {
         }
     }
 
+    private void validateFile(MultipartFile file) {
+        if (!isTypeFileValid(file))
+            throw new FileNotSupportedException(fileNotSupported);
+
+        if (file.isEmpty())
+            throw new FileIsEmptyException(fileIsEmpty);
+    }
+
+    private boolean isTypeFileValid(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        return (fileName != null && (fileName.endsWith(".csv") || fileName.endsWith(".xml")));
+    }
 
     private boolean isAnyParameterNull(String... parameters) {
         for (String parameter : parameters)
