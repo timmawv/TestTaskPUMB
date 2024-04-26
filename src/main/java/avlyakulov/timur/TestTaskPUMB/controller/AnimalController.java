@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.Optional;
 
 @Slf4j
@@ -77,7 +76,7 @@ public class AnimalController {
         return ResponseEntity.ok(animalService.getAnimals());
     }
 
-    @Operation(summary = "Upload file to server", description = "Upload only .xml or .csv files to server")
+    @Operation(summary = "Upload file to server", description = "Upload only .xml or .csv files to server.")
     @ApiResponse(responseCode = "200",
             description = "File was successfully uploaded",
             content = {
