@@ -1,6 +1,6 @@
 package avlyakulov.timur.TestTaskPUMB.controller;
 
-import avlyakulov.timur.TestTaskPUMB.exception.*;
+import avlyakulov.timur.TestTaskPUMB.exception.ApiMessage;
 import avlyakulov.timur.TestTaskPUMB.service.AnimalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.query.sqm.PathElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +22,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/files/uploads")
 public class AnimalController {
-
-    private String fileNotAdded = "You didn't add any files. Please attach at least one file.";
-
-    private String fileUploaded = "File was upload and animals were saved.";
-
-    private String sortByMessageException = "Your parameter sort_by is incorrect. Please enter valid parameter.";
 
     AnimalService animalService;
 
@@ -56,15 +49,16 @@ public class AnimalController {
                     })
     })
     @GetMapping
-    public ResponseEntity<?> getAnimals(@RequestParam(name = "sort_by", required = false) @Parameter(name = "sort_by", description = "field by which animals will be sorted", example = "name") String fieldToSort,
-                                        @RequestParam(name = "type_sort", required = false) @Parameter(name = "type_sort", description = "type of sorting supports only asc, desc", example = "asc") String typeSort,
-                                        @RequestParam(name = "filter_field", required = false) @Parameter(name = "filter_field", description = "filter field contains type, category, sex", example = "type") String filterField,
-                                        @RequestParam(name = "filter_value", required = false) @Parameter(name = "filter_value", description = "filter value for filtering", example = "cat") String filterValue) {
-        try {
-            return ResponseEntity.ok(animalService.getAnimals(filterField, filterValue, fieldToSort, typeSort));
-        } catch (FieldSortException | TypeSortException | FilterFieldException | CategoryNumberException e) {
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
-        }
+    public ResponseEntity<?> getAnimals(@RequestParam(name = "sort_by", required = false)
+                                        @Parameter(name = "sort_by", description = "field by which animals will be sorted", example = "name") String fieldToSort,
+                                        @RequestParam(name = "type_sort", required = false)
+                                        @Parameter(name = "type_sort", description = "type of sorting supports only asc, desc", example = "asc") String typeSort,
+                                        @RequestParam(name = "filter_field", required = false)
+                                        @Parameter(name = "filter_field", description = "filter field contains type, category, sex", example = "type") String filterField,
+                                        @RequestParam(name = "filter_value", required = false)
+                                        @Parameter(name = "filter_value", description = "filter value for filtering", example = "cat") String filterValue) {
+
+        return ResponseEntity.ok(animalService.getAnimals(filterField, filterValue, fieldToSort, typeSort));
     }
 
     @Operation(summary = "Upload file to server", description = "Upload only .xml or .csv files to server.")
@@ -83,16 +77,13 @@ public class AnimalController {
             })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadAnimals(@RequestPart(value = "file") Optional<MultipartFile> file) {
-        if (file.isEmpty())
-            return ResponseEntity.badRequest().body(new ApiMessage(fileNotAdded));
 
-        try {
-            animalService.parseFileToAnimalEntities(file.get());
-        } catch (FileNotSupportedException | FileIsEmptyException e) {
-            return ResponseEntity.badRequest().body(new ApiMessage(e.getMessage()));
-        }
+        if (file.isEmpty())
+            return ResponseEntity.badRequest().body(new ApiMessage("You didn't add any files. Please attach at least one file."));
+
+        animalService.parseFileToAnimalEntities(file.get());
 
         log.info("One file was uploaded");
-        return ResponseEntity.ok(new ApiMessage(fileUploaded));
+        return ResponseEntity.ok(new ApiMessage("File was upload and animals were saved."));
     }
 }

@@ -1,11 +1,11 @@
 package avlyakulov.timur.TestTaskPUMB.service;
 
-import avlyakulov.timur.TestTaskPUMB.dto.csv.AnimalRequestCSV;
-import avlyakulov.timur.TestTaskPUMB.dto.xml.AnimalXML;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
+import avlyakulov.timur.TestTaskPUMB.util.file_parser.ParseFileToAnimalUtil;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +23,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AnimalServiceTest {
@@ -32,155 +31,64 @@ class AnimalServiceTest {
     @Mock
     private AnimalRepository animalRepository;
 
+    @Mock
+    private ParseFileToAnimalUtil parseFileToAnimalUtil;
+
+    @Mock
+    private EntityManager entityManager;
+
+    @Mock
+    private AnimalMapper animalMapper;
+
     @Captor
     ArgumentCaptor<List<Animal>> animalCaptor;
 
     @InjectMocks
     private AnimalService animalService;
 
-    private final String csvFileContent = """
-            Name,Type,Sex,Weight,Cost
-            Buddy,cat,female,41,78
-            Cooper,,female,46,23
-            Duke,cat,male,33,108
-            Rocky,dog,,18,77
-            Sadie,cat,male,26,27
-            Leo,cat,female,23,82
-            ,cat,male,32,44
-            Lola,dog,male,35,105
-            Bailey,dog,male,42,46
-            Loki,cat,female,11,87
-            """;
-    private AnimalRequestCSV animalRequestCSVFirst = new AnimalRequestCSV("Buddy", "cat", "female", "41", "78");
+    List<Animal> animalFromCsvFileList = List.of(new Animal(null, "Buddy", "cat", "female", 41, 78, null));
 
-    private final String xmlFileContent = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <animals>
-            	<animal>
-            		<name>Milo</name>
-            		<type>cat</type>
-            		<sex>male</sex>
-            		<weight>40</weight>
-            		<cost>51</cost>
-            	</animal>
-            	<animal>
-            		<name>Simon</name>
-            		<type>dog</type>
-            		<sex>male</sex>
-            		<weight>45</weight>
-            		<cost>17</cost>
-            	</animal>
-            	<animal>
-            		<name>Molly</name>
-            		<type>cat</type>
-            		<sex>male</sex>
-            		<weight>38</weight>
-            		<cost>59</cost>
-            	</animal>
-            	<animal>
-            		<type>dog</type>
-            		<sex>male</sex>
-            		<weight>9</weight>
-            		<cost>67</cost>
-            	</animal>
-            	<animal>
-            		<name>Simba</name>
-            		<type>dog</type>
-            		<sex>male</sex>
-            		<weight>14</weight>
-            		<cost>57</cost>
-            	</animal>
-            	<animal>
-            		<name>Nala</name>
-            		<type>cat</type>
-            		<sex>male</sex>
-            		<weight>31</weight>
-            	</animal>
-            	<animal>
-            		<name>Toby</name>
-            		<type>dog</type>
-            		<sex>female</sex>
-            		<weight>7</weight>
-            		<cost>14</cost>
-            	</animal>
-            	<animal>
-            		<name>Tucker</name>
-            		<type>cat</type>
-            		<sex>female</sex>
-            		<weight>10</weight>
-            		<cost>44</cost>
-            	</animal>
-            	<animal>
-            		<name>Jack</name>
-            		<type>cat</type>
-            		<sex>female</sex>
-            		<cost>12</cost>
-            	</animal>
-            	<animal>
-            		<name>Zoe</name>
-            		<type>cat</type>
-            		<sex>male</sex>
-            		<weight>30</weight>
-            		<cost>49</cost>
-            	</animal>
-            </animals>        
-            """;
+    List<Animal> animalFromXmlFileList = List.of(new Animal(null, "Milo", "cat", "male", 40, 51, null));
 
-    private AnimalXML animalRequestXmlFirst = new AnimalXML("Milo", "cat", "male", "40", "51");
-
-    private final int numberValidAnimals = 7;
-
-    MultipartFile fileCsv;
-    MultipartFile fileXml;
-
-    @BeforeEach
-    void setUp() {
-        fileCsv = new MockMultipartFile("animals", "animals.csv", "text/csv", csvFileContent.getBytes());
-        fileXml = new MockMultipartFile("animals", "animals.xml", "application/xml", xmlFileContent.getBytes());
-        animalService.setAnimalMapper(Mappers.getMapper(AnimalMapper.class));
-    }
 
     @Test
     public void parseFileToAnimalEntities_parseCsvFile() {
-        animalService.parseFileToAnimalEntities(fileCsv);
-        int weight = 41;
-        int cost = 78;
+        MultipartFile fileCsv = new MockMultipartFile("animals", "animals.csv", "text/csv", "file csv".getBytes());
+        Animal animalFromCsvFile = animalFromCsvFileList.get(0);
         int category = 4;
+        doReturn(animalFromCsvFileList).when(parseFileToAnimalUtil).parseFileToListAnimal(fileCsv);
 
+        animalService.parseFileToAnimalEntities(fileCsv);
         verify(animalRepository, times(1)).saveAll(animalCaptor.capture());
-
         List<Animal> animalCaptorValue = animalCaptor.getValue();
-        Animal animalFirst = animalCaptorValue.get(0);
 
-        assertThat(animalCaptorValue).hasSize(numberValidAnimals);
-        assertThat(animalFirst.getName()).isEqualTo(animalRequestCSVFirst.getName());
-        assertThat(animalFirst.getType()).isEqualTo(animalRequestCSVFirst.getType());
-        assertThat(animalFirst.getSex()).isEqualTo(animalRequestCSVFirst.getSex());
-        assertThat(animalFirst.getWeight()).isEqualTo(weight);
-        assertThat(animalFirst.getCost()).isEqualTo(cost);
-        assertThat(animalFirst.getCategory()).isEqualTo(category);
-
+        Animal animal = animalCaptorValue.get(0);
+        assertThat(animal.getId()).isNull();
+        assertThat(animal.getName()).isEqualTo(animalFromCsvFile.getName());
+        assertThat(animal.getType()).isEqualTo(animalFromCsvFile.getType());
+        assertThat(animal.getSex()).isEqualTo(animalFromCsvFile.getSex());
+        assertThat(animal.getWeight()).isEqualTo(animalFromCsvFile.getWeight());
+        assertThat(animal.getCategory()).isEqualTo(category);
     }
 
     @Test
     public void parseFileToAnimalEntities_parseXmlFile() {
-        animalService.parseFileToAnimalEntities(fileXml);
-        int weight = 40;
-        int cost = 51;
+        MultipartFile fileXml = new MockMultipartFile("animals", "animals.xml", "application/xml", "file xml".getBytes());
+        Animal animalFromXmlFile = animalFromXmlFileList.get(0);
         int category = 3;
+        doReturn(animalFromXmlFileList).when(parseFileToAnimalUtil).parseFileToListAnimal(fileXml);
 
+        animalService.parseFileToAnimalEntities(fileXml);
         verify(animalRepository, times(1)).saveAll(animalCaptor.capture());
-
         List<Animal> animalCaptorValue = animalCaptor.getValue();
-        Animal animalFirst = animalCaptorValue.get(0);
 
-        assertThat(animalCaptorValue).hasSize(numberValidAnimals);
-        assertThat(animalFirst.getName()).isEqualTo(animalRequestXmlFirst.getName());
-        assertThat(animalFirst.getType()).isEqualTo(animalRequestXmlFirst.getType());
-        assertThat(animalFirst.getSex()).isEqualTo(animalRequestXmlFirst.getSex());
-        assertThat(animalFirst.getWeight()).isEqualTo(weight);
-        assertThat(animalFirst.getCost()).isEqualTo(cost);
-        assertThat(animalFirst.getCategory()).isEqualTo(category);
+        Animal animal = animalCaptorValue.get(0);
+        assertThat(animal.getId()).isNull();
+        assertThat(animal.getName()).isEqualTo(animalFromXmlFile.getName());
+        assertThat(animal.getType()).isEqualTo(animalFromXmlFile.getType());
+        assertThat(animal.getSex()).isEqualTo(animalFromXmlFile.getSex());
+        assertThat(animal.getWeight()).isEqualTo(animalFromXmlFile.getWeight());
+        assertThat(animal.getCategory()).isEqualTo(category);
     }
 
     @Test

@@ -18,7 +18,9 @@ services:
       retries: 3
 
   animals_upload:
-    image: animals_uploader
+    build:
+      context: ./
+      dockerfile: Dockerfile
     environment:
       DB_URL: jdbc:postgresql://postgres_db:5432/animals_db
     ports:

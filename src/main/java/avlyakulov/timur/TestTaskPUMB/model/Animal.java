@@ -2,13 +2,17 @@ package avlyakulov.timur.TestTaskPUMB.model;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "animals")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Animal {
 
     @Id
