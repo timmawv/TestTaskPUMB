@@ -49,14 +49,11 @@ public class AnimalController {
                     })
     })
     @GetMapping
-    public ResponseEntity<?> getAnimals(@RequestParam(name = "sort_by", required = false)
-                                        @Parameter(name = "sort_by", description = "field by which animals will be sorted", example = "name") String fieldToSort,
-                                        @RequestParam(name = "type_sort", required = false)
-                                        @Parameter(name = "type_sort", description = "type of sorting supports only asc, desc", example = "asc") String typeSort,
-                                        @RequestParam(name = "filter_field", required = false)
-                                        @Parameter(name = "filter_field", description = "filter field contains type, category, sex", example = "type") String filterField,
-                                        @RequestParam(name = "filter_value", required = false)
-                                        @Parameter(name = "filter_value", description = "filter value for filtering", example = "cat") String filterValue) {
+    public ResponseEntity<?> getAnimals(
+    @RequestParam(name = "sort_by", required = false) @Parameter(name = "sort_by", description = "field by which animals will be sorted", example = "name") String fieldToSort,
+    @RequestParam(name = "type_sort", required = false) @Parameter(name = "type_sort", description = "type of sorting supports only asc, desc", example = "asc") String typeSort,
+    @RequestParam(name = "filter_field", required = false) @Parameter(name = "filter_field", description = "filter field contains type, category, sex", example = "type") String filterField,
+    @RequestParam(name = "filter_value", required = false) @Parameter(name = "filter_value", description = "filter value for filtering", example = "cat") String filterValue) {
 
         return ResponseEntity.ok(animalService.getAnimals(filterField, filterValue, fieldToSort, typeSort));
     }

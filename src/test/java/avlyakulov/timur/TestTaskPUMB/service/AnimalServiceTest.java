@@ -1,11 +1,13 @@
 package avlyakulov.timur.TestTaskPUMB.service;
 
+import avlyakulov.timur.TestTaskPUMB.dao.AnimalDao;
+import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
+import avlyakulov.timur.TestTaskPUMB.exception.FilterFieldException;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
 import avlyakulov.timur.TestTaskPUMB.util.file_parser.ParseFileToAnimalUtil;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,10 +37,7 @@ class AnimalServiceTest {
     private ParseFileToAnimalUtil parseFileToAnimalUtil;
 
     @Mock
-    private EntityManager entityManager;
-
-    @Mock
-    private AnimalMapper animalMapper;
+    AnimalDao animalDao;
 
     @Captor
     ArgumentCaptor<List<Animal>> animalCaptor;
@@ -46,10 +45,79 @@ class AnimalServiceTest {
     @InjectMocks
     private AnimalService animalService;
 
-    List<Animal> animalFromCsvFileList = List.of(new Animal(null, "Buddy", "cat", "female", 41, 78, null));
+    private List<Animal> animalFromCsvFileList = List.of(new Animal(null, "Buddy", "cat", "female", 41, 78, null));
 
-    List<Animal> animalFromXmlFileList = List.of(new Animal(null, "Milo", "cat", "male", 40, 51, null));
+    private List<Animal> animalFromXmlFileList = List.of(new Animal(null, "Milo", "cat", "male", 40, 51, null));
 
+    private List<Animal> animalsFromDb = List.of(new Animal(1, "Buddy", "cat", "female", 41, 78, 4));
+
+    @BeforeEach
+    void setUp() {
+        AnimalMapper animalMapper = Mappers.getMapper(AnimalMapper.class);
+        animalService.setAnimalMapper(animalMapper);
+    }
+
+    @Test
+    public void getAnimals_getAnimalsWithoutFilteringAndSorting() {
+        String filterField = null;
+        String filterValue = null;
+        String fieldSort = null;
+        String typeSort = null;
+        doReturn(animalsFromDb).when(animalDao).getAnimals(fieldSort, typeSort);
+
+        List<AnimalResponse> animals = animalService.getAnimals(filterField, filterValue, fieldSort, typeSort);
+
+        assertThat(animals).hasSize(1);
+        verify(animalDao, times(0)).getAnimalsWithFiltering(filterField, filterValue, fieldSort, typeSort);
+    }
+
+    @Test
+    public void getAnimals_throwException_userGaveOnlyFilterField() {
+        String filterField = "type";
+        String filterValue = null;
+        String fieldSort = null;
+        String typeSort = null;
+
+        assertThrows(FilterFieldException.class, () -> animalService.getAnimals(filterField, filterValue, fieldSort, typeSort));
+    }
+
+    @Test
+    public void getAnimals_throwException_userGaveNotValidFilterField() {
+        String filterField = "type22";
+        String filterValue = "cat";
+        String fieldSort = null;
+        String typeSort = null;
+
+        assertThrows(FilterFieldException.class, () -> animalService.getAnimals(filterField, filterValue, fieldSort, typeSort));
+    }
+
+    @Test
+    public void getAnimals_getAnimalsWithFiltering() {
+        String filterField = "sex";
+        String filterValue = "male";
+        String fieldSort = null;
+        String typeSort = null;
+
+        doReturn(animalsFromDb).when(animalDao).getAnimalsWithFiltering(filterField, filterValue, fieldSort, typeSort);
+
+        List<AnimalResponse> animals = animalService.getAnimals(filterField, filterValue, fieldSort, typeSort);
+        assertThat(animals).hasSize(1);
+        verify(animalDao, times(0)).getAnimals(fieldSort, typeSort);
+    }
+
+    @Test
+    public void getAnimals_getAnimalsWithFilteringAndSorting() {
+        String filterField = "sex";
+        String filterValue = "male";
+        String fieldSort = "category";
+        String typeSort = "desc";
+
+        doReturn(animalsFromDb).when(animalDao).getAnimalsWithFiltering(filterField, filterValue, fieldSort, typeSort);
+
+        List<AnimalResponse> animals = animalService.getAnimals(filterField, filterValue, fieldSort, typeSort);
+        assertThat(animals).hasSize(1);
+        verify(animalDao, times(0)).getAnimals(fieldSort, typeSort);
+    }
 
     @Test
     public void parseFileToAnimalEntities_parseCsvFile() {
