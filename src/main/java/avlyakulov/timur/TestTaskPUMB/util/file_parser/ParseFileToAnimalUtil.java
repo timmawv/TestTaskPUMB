@@ -26,7 +26,7 @@ public class ParseFileToAnimalUtil {
 
     private final String csvType = "text/csv";
 
-    private final String xmlType = "application/xml";
+    private final String xmlType = "text/xml";
 
     private AnimalMapper animalMapper;
 

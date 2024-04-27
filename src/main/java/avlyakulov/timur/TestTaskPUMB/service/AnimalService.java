@@ -72,7 +72,7 @@ public class AnimalService {
     }
 
     private boolean isFileNotValid(String fileType) {
-        return !(fileType.equals("text/csv") || fileType.equals("application/xml"));
+        return !(fileType.equals("text/csv") || fileType.equals("text/xml"));
     }
 
     private void setCategoryToAnimal(List<Animal> animals) {
