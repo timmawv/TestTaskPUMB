@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @Slf4j
@@ -63,7 +64,8 @@ public class AnimalService {
     }
 
     private void validateFile(MultipartFile file) {
-        String fileType = file.getContentType();
+        String fileType = file.getOriginalFilename();
+
         if (isFileNotValid(fileType))
             throw new FileNotSupportedException("Our application supports only .csv and .xml. Please use these file types.");
 
@@ -72,7 +74,7 @@ public class AnimalService {
     }
 
     private boolean isFileNotValid(String fileType) {
-        return !(fileType.equals("text/csv") || fileType.equals("text/xml"));
+        return !(fileType.endsWith(".csv") || fileType.endsWith(".xml"));
     }
 
     private void setCategoryToAnimal(List<Animal> animals) {

@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,9 +25,9 @@ import java.util.List;
 @Component
 public class ParseFileToAnimalUtil {
 
-    private final String csvType = "text/csv";
+    private final String csvType = ".csv";
 
-    private final String xmlType = "text/xml";
+    private final String xmlType = ".xml";
 
     private AnimalMapper animalMapper;
 
@@ -36,16 +37,15 @@ public class ParseFileToAnimalUtil {
     }
 
     public List<Animal> parseFileToListAnimal(MultipartFile file) {
-        String contentType = file.getContentType();
-        switch (contentType) {
-            case (csvType) -> {
-                return parseCsvFile(file);
-            }
-            case (xmlType) -> {
-                return parseXmlFile(file);
-            }
-            default -> throw new FileNotSupportedException("Error during parsing file. File format not supported");
+        String fileType = file.getOriginalFilename();
+        if (fileType.endsWith(csvType)) {
+            return parseCsvFile(file);
         }
+        if (fileType.endsWith(xmlType)) {
+            return parseXmlFile(file);
+        }
+
+        throw new FileNotSupportedException("Error during parsing file. File format not supported");
     }
 
     private List<Animal> parseCsvFile(MultipartFile file) {
