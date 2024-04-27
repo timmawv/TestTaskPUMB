@@ -1,0 +1,67 @@
+{
+	"info": {
+		"_postman_id": "728e2ff3-3ab7-43cd-8d1a-fd1c522b2fd0",
+		"name": "Animals",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "29613522"
+	},
+	"item": [
+		{
+			"name": "Send file",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": "http://localhost:8080/files/uploads"
+			},
+			"response": []
+		},
+		{
+			"name": "get Animals",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/files/uploads?sort_by=weight&type_sort=desc&filter_field=sex&filter_value=female",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"files",
+						"uploads"
+					],
+					"query": [
+						{
+							"key": "sort_by",
+							"value": "weight"
+						},
+						{
+							"key": "type_sort",
+							"value": "desc"
+						},
+						{
+							"key": "filter_field",
+							"value": "sex"
+						},
+						{
+							"key": "filter_value",
+							"value": "female"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

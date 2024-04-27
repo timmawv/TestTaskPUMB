@@ -10,6 +10,7 @@ and sort by any field.
 ## Used Technologies
 
 * Spring Boot
+* Postman
 * Liquibase - migration for db
 * PostgresSQL
 * Docker
@@ -38,3 +39,6 @@ Then build project to jar<br>
 `mvn clean package -Dmaven.test.skip`<br>
 After packaging project you can launch it <br>
 `java -jar target/TestTaskPUMB-0.0.1-SNAPSHOT.jar`
+
+## Postman collection for testing
+[Open postman collection](postman_test_collection/Animals.postman_collection.json)
