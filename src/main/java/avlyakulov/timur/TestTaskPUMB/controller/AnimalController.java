@@ -1,6 +1,6 @@
 package avlyakulov.timur.TestTaskPUMB.controller;
 
-import avlyakulov.timur.TestTaskPUMB.exception.ApiMessage;
+import avlyakulov.timur.TestTaskPUMB.dto.ApiMessageResponse;
 import avlyakulov.timur.TestTaskPUMB.service.AnimalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,14 +38,14 @@ public class AnimalController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = ApiMessage.class)))
+                                    array = @ArraySchema(schema = @Schema(implementation = ApiMessageResponse.class)))
                     }),
             @ApiResponse(responseCode = "400",
                     description = "Bad request - User entered the wrong fields",
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ApiMessage.class))
+                                    schema = @Schema(implementation = ApiMessageResponse.class))
                     })
     })
     @GetMapping
@@ -64,23 +64,23 @@ public class AnimalController {
             content = {
                     @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ApiMessage.class))
+                            schema = @Schema(implementation = ApiMessageResponse.class))
             })
     @ApiResponse(responseCode = "400", description = "Bad request - User tried to upload file with wrong type or user didn't attach file",
             content = {
                     @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ApiMessage.class))
+                            schema = @Schema(implementation = ApiMessageResponse.class))
             })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadAnimals(@RequestPart(value = "file") Optional<MultipartFile> file) {
 
         if (file.isEmpty())
-            return ResponseEntity.badRequest().body(new ApiMessage("You didn't add any files. Please attach at least one file."));
+            return ResponseEntity.badRequest().body(new ApiMessageResponse("You didn't add any files. Please attach at least one file."));
 
         animalService.parseFileToAnimalEntities(file.get());
 
         log.info("One file was uploaded");
-        return ResponseEntity.ok(new ApiMessage("File was upload and animals were saved."));
+        return ResponseEntity.ok(new ApiMessageResponse("File was upload and animals were saved."));
     }
 }
