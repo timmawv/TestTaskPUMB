@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -48,9 +49,9 @@ public class AnimalController {
                     })
     })
     @GetMapping
-    public ResponseEntity<List<Animal>> getAnimals(Pageable pageable) {
+    public ResponseEntity<List<Animal>> getAnimals(@RequestParam Map<String, String> searchCriteria, Pageable pageable) {
         Sort sort = pageable.getSort();
-        return ResponseEntity.ok(animalService.getAnimals(sort));
+        return ResponseEntity.ok(animalService.getAnimals(searchCriteria, sort));
     }
 
     @Operation(summary = "Upload file to server", description = "Upload only .xml or .csv files to server.")
