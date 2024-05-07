@@ -9,6 +9,9 @@ import avlyakulov.timur.TestTaskPUMB.exception.FilterFieldException;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
+import avlyakulov.timur.TestTaskPUMB.util.category.Category;
+import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryAssignmentContext;
+import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryStrategy;
 import avlyakulov.timur.TestTaskPUMB.util.file_parser.ParseFileToAnimalUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,26 +80,13 @@ public class AnimalService {
     }
 
     private void setCategoryToAnimal(List<Animal> animals) {
-        animals.forEach(this::defineCategoryOfAnimalByCost);
+        animals.forEach(a -> a.setCategory(getCategoryByAnimalCost(a.getCost())));
     }
 
-    private void defineCategoryOfAnimalByCost(Animal animal) {
-        Integer cost = animal.getCost();
-        if (cost >= 0 && cost <= 20) {
-            animal.setCategory(1);
-            return;
-        }
-        if (cost >= 21 && cost <= 40) {
-            animal.setCategory(2);
-            return;
-        }
-        if (cost >= 41 && cost <= 60) {
-            animal.setCategory(3);
-            return;
-        }
-
-        if (cost >= 61)
-            animal.setCategory(4);
+    private int getCategoryByAnimalCost(Integer cost) {
+        CategoryAssignmentContext categoryAssignmentContext = new CategoryAssignmentContext();
+        CategoryStrategy categoryStrategy = categoryAssignmentContext.defineCategoryOfAnimalByCost(cost);
+        return categoryStrategy.defineCategoryByAnimalsCost().getCategory();
     }
 
     public void setAnimalMapper(AnimalMapper animalMapper) {

@@ -8,6 +8,7 @@ spring:
     password: postgres
   liquibase:
     change-log: db/changelog/main-changelog.xml
+    enabled: true
   servlet:
     multipart:
       max-file-size: 1MB
