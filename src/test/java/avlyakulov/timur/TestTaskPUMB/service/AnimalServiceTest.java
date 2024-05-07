@@ -57,67 +57,67 @@ class AnimalServiceTest {
         animalService.setAnimalMapper(animalMapper);
     }
 
-    @Test
-    public void getAnimals_getAnimalsWithoutFilteringAndSorting() {
-        String filterField = null;
-        String filterValue = null;
-        String fieldSort = null;
-        String typeSort = null;
-        doReturn(animalsFromDb).when(animalDao).getAnimals(fieldSort, typeSort);
-
-        List<AnimalResponse> animals = animalService.getAnimals(filterField, filterValue, fieldSort, typeSort);
-
-        assertThat(animals).hasSize(1);
-        verify(animalDao, times(0)).getAnimalsWithFiltering(filterField, filterValue, fieldSort, typeSort);
-    }
-
-    @Test
-    public void getAnimals_throwException_userGaveOnlyFilterField() {
-        String filterField = "type";
-        String filterValue = null;
-        String fieldSort = null;
-        String typeSort = null;
-
-        assertThrows(FilterFieldException.class, () -> animalService.getAnimals(filterField, filterValue, fieldSort, typeSort));
-    }
-
-    @Test
-    public void getAnimals_throwException_userGaveNotValidFilterField() {
-        String filterField = "type22";
-        String filterValue = "cat";
-        String fieldSort = null;
-        String typeSort = null;
-
-        assertThrows(FilterFieldException.class, () -> animalService.getAnimals(filterField, filterValue, fieldSort, typeSort));
-    }
-
-    @Test
-    public void getAnimals_getAnimalsWithFiltering() {
-        String filterField = "sex";
-        String filterValue = "male";
-        String fieldSort = null;
-        String typeSort = null;
-
-        doReturn(animalsFromDb).when(animalDao).getAnimalsWithFiltering(filterField, filterValue, fieldSort, typeSort);
-
-        List<AnimalResponse> animals = animalService.getAnimals(filterField, filterValue, fieldSort, typeSort);
-        assertThat(animals).hasSize(1);
-        verify(animalDao, times(0)).getAnimals(fieldSort, typeSort);
-    }
-
-    @Test
-    public void getAnimals_getAnimalsWithFilteringAndSorting() {
-        String filterField = "sex";
-        String filterValue = "male";
-        String fieldSort = "category";
-        String typeSort = "desc";
-
-        doReturn(animalsFromDb).when(animalDao).getAnimalsWithFiltering(filterField, filterValue, fieldSort, typeSort);
-
-        List<AnimalResponse> animals = animalService.getAnimals(filterField, filterValue, fieldSort, typeSort);
-        assertThat(animals).hasSize(1);
-        verify(animalDao, times(0)).getAnimals(fieldSort, typeSort);
-    }
+//    @Test
+//    public void getAnimals_getAnimalsWithoutFilteringAndSorting() {
+//        String filterField = null;
+//        String filterValue = null;
+//        String fieldSort = null;
+//        String typeSort = null;
+//        doReturn(animalsFromDb).when(animalDao).getAnimals(fieldSort, typeSort);
+//
+//        List<AnimalResponse> animals = animalService.getAnimals(filterField, filterValue, fieldSort, typeSort);
+//
+//        assertThat(animals).hasSize(1);
+//        verify(animalDao, times(0)).getAnimalsWithFiltering(filterField, filterValue, fieldSort, typeSort);
+//    }
+//
+//    @Test
+//    public void getAnimals_throwException_userGaveOnlyFilterField() {
+//        String filterField = "type";
+//        String filterValue = null;
+//        String fieldSort = null;
+//        String typeSort = null;
+//
+//        assertThrows(FilterFieldException.class, () -> animalService.getAnimals(filterField, filterValue, fieldSort, typeSort));
+//    }
+//
+//    @Test
+//    public void getAnimals_throwException_userGaveNotValidFilterField() {
+//        String filterField = "type22";
+//        String filterValue = "cat";
+//        String fieldSort = null;
+//        String typeSort = null;
+//
+//        assertThrows(FilterFieldException.class, () -> animalService.getAnimals(filterField, filterValue, fieldSort, typeSort));
+//    }
+//
+//    @Test
+//    public void getAnimals_getAnimalsWithFiltering() {
+//        String filterField = "sex";
+//        String filterValue = "male";
+//        String fieldSort = null;
+//        String typeSort = null;
+//
+//        doReturn(animalsFromDb).when(animalDao).getAnimalsWithFiltering(filterField, filterValue, fieldSort, typeSort);
+//
+//        List<AnimalResponse> animals = animalService.getAnimals(filterField, filterValue, fieldSort, typeSort);
+//        assertThat(animals).hasSize(1);
+//        verify(animalDao, times(0)).getAnimals(fieldSort, typeSort);
+//    }
+//
+//    @Test
+//    public void getAnimals_getAnimalsWithFilteringAndSorting() {
+//        String filterField = "sex";
+//        String filterValue = "male";
+//        String fieldSort = "category";
+//        String typeSort = "desc";
+//
+//        doReturn(animalsFromDb).when(animalDao).getAnimalsWithFiltering(filterField, filterValue, fieldSort, typeSort);
+//
+//        List<AnimalResponse> animals = animalService.getAnimals(filterField, filterValue, fieldSort, typeSort);
+//        assertThat(animals).hasSize(1);
+//        verify(animalDao, times(0)).getAnimals(fieldSort, typeSort);
+//    }
 
     @Test
     public void parseFileToAnimalEntities_parseCsvFile() {

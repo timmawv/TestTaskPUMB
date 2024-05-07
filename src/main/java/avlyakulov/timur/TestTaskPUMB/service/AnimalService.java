@@ -1,20 +1,21 @@
 package avlyakulov.timur.TestTaskPUMB.service;
 
 import avlyakulov.timur.TestTaskPUMB.dao.AnimalDao;
-import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
-import avlyakulov.timur.TestTaskPUMB.exception.CategoryNumberException;
+import avlyakulov.timur.TestTaskPUMB.exception.FieldSortException;
 import avlyakulov.timur.TestTaskPUMB.exception.FileIsEmptyException;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
-import avlyakulov.timur.TestTaskPUMB.exception.FilterFieldException;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
-import avlyakulov.timur.TestTaskPUMB.util.category.Category;
 import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryAssignmentContext;
 import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryStrategy;
 import avlyakulov.timur.TestTaskPUMB.util.file_parser.ParseFileToAnimalUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,22 +41,14 @@ public class AnimalService {
         this.parseFileToAnimal = parseFileToAnimal;
     }
 
-    public List<AnimalResponse> getAnimals(String filterField, String filterValue, String fieldToSort, String typeSort) {
-        if (filterField != null && filterValue == null)
-            throw new FilterFieldException("You can't sort only by filter filed, you have to add filter value too");
-
-        if (filterField != null) {
-            if (!"type, category, sex".contains(filterField))
-                throw new FilterFieldException("Your field to filtering is incorrect. Please enter correct field to filtering. For instance: type, category, sex.");
-            try {
-                List<Animal> animalsWithFiltering = animalDao.getAnimalsWithFiltering(filterField, filterValue, fieldToSort, typeSort);
-                return animalMapper.mapListAnimalToAnimalResponse(animalsWithFiltering);
-            } catch (RuntimeException e) {
-                throw new CategoryNumberException("Your filter value is incorrect. Please enter correct filter value. For instance for category: 1, 2, 3, 4.");
-            }
+    public List<Animal> getAnimals(Sort sort) {
+        try {
+            if (sort != null)
+                return animalRepository.findAll(sort);
+            return animalRepository.findAll();
+        } catch (PropertyReferenceException ex) {
+            throw new FieldSortException(ex.getMessage());
         }
-        List<Animal> animals = animalDao.getAnimals(fieldToSort, typeSort);
-        return animalMapper.mapListAnimalToAnimalResponse(animals);
     }
 
     public void parseFileToAnimalEntities(MultipartFile file) {

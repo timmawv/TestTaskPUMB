@@ -1,34 +1,33 @@
 package avlyakulov.timur.TestTaskPUMB.controller;
 
 import avlyakulov.timur.TestTaskPUMB.dto.ApiMessageResponse;
+import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.service.AnimalService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequestMapping("/files/uploads")
+@RequiredArgsConstructor
 public class AnimalController {
 
-    AnimalService animalService;
-
-    @Autowired
-    public AnimalController(AnimalService animalService) {
-        this.animalService = animalService;
-    }
+    private final AnimalService animalService;
 
     @Operation(summary = "Get list of animals", description = "Returns a list of animals that filter by field or not, sorted by field or not. If you do not specify the sort type, the default is ASC")
     @ApiResponses(value = {
@@ -49,13 +48,9 @@ public class AnimalController {
                     })
     })
     @GetMapping
-    public ResponseEntity<?> getAnimals(
-    @RequestParam(name = "sort_by", required = false) @Parameter(name = "sort_by", description = "field by which animals will be sorted", example = "name") String fieldToSort,
-    @RequestParam(name = "type_sort", required = false) @Parameter(name = "type_sort", description = "type sorting asc,desc. If not specified by default asc", example = "asc") String typeSort,
-    @RequestParam(name = "filter_field", required = false) @Parameter(name = "filter_field", description = "filter field contains type, category, sex", example = "type") String filterField,
-    @RequestParam(name = "filter_value", required = false) @Parameter(name = "filter_value", description = "filter value for filtering", example = "cat") String filterValue) {
-
-        return ResponseEntity.ok(animalService.getAnimals(filterField, filterValue, fieldToSort, typeSort));
+    public ResponseEntity<List<Animal>> getAnimals(Pageable pageable) {
+        Sort sort = pageable.getSort();
+        return ResponseEntity.ok(animalService.getAnimals(sort));
     }
 
     @Operation(summary = "Upload file to server", description = "Upload only .xml or .csv files to server.")
