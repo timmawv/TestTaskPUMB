@@ -1,13 +1,10 @@
 package avlyakulov.timur.TestTaskPUMB.service;
 
 import avlyakulov.timur.TestTaskPUMB.dao.AnimalDao;
-import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
-import avlyakulov.timur.TestTaskPUMB.exception.FilterFieldException;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
-import avlyakulov.timur.TestTaskPUMB.util.file_parser.ParseFileToAnimalUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

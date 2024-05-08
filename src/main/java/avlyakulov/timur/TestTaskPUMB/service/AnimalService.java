@@ -4,14 +4,16 @@ import avlyakulov.timur.TestTaskPUMB.dto.AnimalSpecs;
 import avlyakulov.timur.TestTaskPUMB.exception.FieldSortException;
 import avlyakulov.timur.TestTaskPUMB.exception.FileIsEmptyException;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
-import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
 import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryAssignmentContext;
 import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryStrategy;
-import avlyakulov.timur.TestTaskPUMB.util.file_parser.ParseFileToAnimalUtil;
+import avlyakulov.timur.TestTaskPUMB.util.file_parser.FileParserAnimal;
+import avlyakulov.timur.TestTaskPUMB.util.file_parser.FileParserCsv;
+import avlyakulov.timur.TestTaskPUMB.util.file_parser.FileParserXml;
+import avlyakulov.timur.TestTaskPUMB.util.specification.SpecificationValidContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.mapping.PropertyReferenceException;
@@ -24,20 +26,12 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AnimalService {
 
-    private AnimalMapper animalMapper;
+    private final AnimalRepository animalRepository;
 
-    private AnimalRepository animalRepository;
-
-    private ParseFileToAnimalUtil parseFileToAnimal;
-
-    @Autowired
-    public AnimalService(AnimalMapper animalMapper, AnimalRepository animalRepository, ParseFileToAnimalUtil parseFileToAnimal) {
-        this.animalMapper = animalMapper;
-        this.animalRepository = animalRepository;
-        this.parseFileToAnimal = parseFileToAnimal;
-    }
+    private FileParserAnimal fileParserAnimal;
 
     public List<Animal> getAnimals(Map<String, String> searchCriteria, Sort sort) {
         Specification<Animal> spec = Specification.where(null);
@@ -66,7 +60,20 @@ public class AnimalService {
 
     public void parseFileToAnimalEntities(MultipartFile file) {
         validateFile(file);
-        List<Animal> animals = parseFileToAnimal.parseFileToListAnimal(file);
+        String fileType = getFileType(file);
+        List<Animal> animals;
+        switch (fileType) {
+            case "xml" -> {
+                fileParserAnimal = new FileParserXml();
+                animals = fileParserAnimal.parseFileToListAnimal(file);
+            }
+            case "csv" -> {
+                fileParserAnimal = new FileParserCsv();
+                animals = fileParserAnimal.parseFileToListAnimal(file);
+            }
+            default -> throw new FileNotSupportedException("This type of file not supported");
+        }
+        animals = validateAnimalsByParameters(animals);
         setCategoryToAnimal(animals);
         animalRepository.saveAll(animals);
     }
@@ -85,6 +92,12 @@ public class AnimalService {
         return !(fileType.endsWith(".csv") || fileType.endsWith(".xml"));
     }
 
+    private String getFileType(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        String[] fileType = originalFilename.split("\\.");
+        return fileType[1];
+    }
+
     private void setCategoryToAnimal(List<Animal> animals) {
         animals.forEach(a -> a.setCategory(getCategoryByAnimalCost(a.getCost())));
     }
@@ -95,7 +108,14 @@ public class AnimalService {
         return categoryStrategy.defineCategoryByAnimalsCost().getCategory();
     }
 
-    public void setAnimalMapper(AnimalMapper animalMapper) {
-        this.animalMapper = animalMapper;
+    private List<Animal> validateAnimalsByParameters(List<Animal> animals) {
+        return animals.stream()
+                .filter(this::isAnimalValid)
+                .toList();
+    }
+
+    private boolean isAnimalValid(Animal animal) {
+        SpecificationValidContext specificationValidContext = new SpecificationValidContext();
+        return specificationValidContext.isAnimalValid(animal);
     }
 }
