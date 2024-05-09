@@ -1,19 +1,19 @@
 package avlyakulov.timur.TestTaskPUMB.controller;
 
+import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
 import avlyakulov.timur.TestTaskPUMB.dto.ApiMessageResponse;
+import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.service.AnimalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -23,20 +23,19 @@ public class AnimalController {
 
     private final AnimalService animalService;
 
+    private final AnimalMapper animalMapper;
+
     @GetMapping
-    public ResponseEntity<List<Animal>> getAnimals(@RequestParam Map<String, String> searchCriteria, Sort sort) {
-        return ResponseEntity.ok(animalService.getAnimals(searchCriteria, sort));
+    public ResponseEntity<List<AnimalResponse>> getAnimals(@RequestParam Map<String, String> searchCriteria, Sort sort) {
+        //todo make param dto not map
+        List<Animal> animals = animalService.getAnimals(searchCriteria, sort);
+        return ResponseEntity.ok(animalMapper.mapListAnimalToAnimalResponse(animals));
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadAnimals(@RequestPart(value = "file") Optional<MultipartFile> file) {
-
-        if (file.isEmpty())
-            return ResponseEntity.badRequest().body(new ApiMessageResponse("You didn't add any files. Please attach at least one file."));
-
-        animalService.parseFileToAnimalEntities(file.get());
-
+    @PostMapping
+    public ResponseEntity<List<AnimalResponse>> uploadAnimals(@RequestPart(value = "file", required = false) MultipartFile file) {
+        List<Animal> animals = animalService.parseFile(file);
         log.info("One file was uploaded");
-        return ResponseEntity.ok(new ApiMessageResponse("File was upload and animals were saved."));
+        return ResponseEntity.ok(animalMapper.mapListAnimalToAnimalResponse(animals));
     }
 }

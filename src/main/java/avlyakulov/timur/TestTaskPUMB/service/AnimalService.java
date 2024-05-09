@@ -2,15 +2,16 @@ package avlyakulov.timur.TestTaskPUMB.service;
 
 import avlyakulov.timur.TestTaskPUMB.dto.AnimalSpecs;
 import avlyakulov.timur.TestTaskPUMB.exception.FieldSortException;
-import avlyakulov.timur.TestTaskPUMB.exception.FileIsEmptyException;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
 import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryAssignmentContext;
 import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryStrategy;
-import avlyakulov.timur.TestTaskPUMB.util.file_parser.FileParserAnimal;
-import avlyakulov.timur.TestTaskPUMB.util.file_parser.FileParserCsv;
-import avlyakulov.timur.TestTaskPUMB.util.file_parser.FileParserXml;
+import avlyakulov.timur.TestTaskPUMB.util.file.FileType;
+import avlyakulov.timur.TestTaskPUMB.util.file.FileUtil;
+import avlyakulov.timur.TestTaskPUMB.util.file.file_parser.FileParserAnimal;
+import avlyakulov.timur.TestTaskPUMB.util.file.file_parser.FileParserCsv;
+import avlyakulov.timur.TestTaskPUMB.util.file.file_parser.FileParserXml;
 import avlyakulov.timur.TestTaskPUMB.util.specification.SpecificationValidContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +32,6 @@ public class AnimalService {
 
     private final AnimalRepository animalRepository;
 
-    private FileParserAnimal fileParserAnimal;
-
     public List<Animal> getAnimals(Map<String, String> searchCriteria, Sort sort) {
         Specification<Animal> spec = Specification.where(null);
 
@@ -50,72 +49,54 @@ public class AnimalService {
             spec = spec.and(AnimalSpecs.hasSex(searchCriteria.get("sex")));
 
         try {
-            if (sort != null)
-                return animalRepository.findAll(spec, sort);
-            return animalRepository.findAll(spec);
+            return animalRepository.findAll(spec, sort);
         } catch (PropertyReferenceException ex) {
             throw new FieldSortException(ex.getMessage());
         }
     }
 
-    public void parseFileToAnimalEntities(MultipartFile file) {
-        validateFile(file);
-        String fileType = getFileType(file);
-        List<Animal> animals;
+    public List<Animal> parseFile(MultipartFile file) {
+        List<Animal> animals = parseFileToAnimalEntities(file);
+        animals = validateAnimalsByParameters(animals);
+        setCategoryToAnimal(animals);
+        return animalRepository.saveAll(animals);
+    }
+
+    private List<Animal> parseFileToAnimalEntities(MultipartFile file) {
+        FileUtil fileUtil = new FileUtil();
+        FileType fileType = fileUtil.getFileType(file);
+        FileParserAnimal fileParserAnimal;
         switch (fileType) {
-            case "xml" -> {
+            case XML -> {
                 fileParserAnimal = new FileParserXml();
-                animals = fileParserAnimal.parseFileToListAnimal(file);
+                return fileParserAnimal.parseFileToListAnimal(file);
             }
-            case "csv" -> {
+            case CSV -> {
                 fileParserAnimal = new FileParserCsv();
-                animals = fileParserAnimal.parseFileToListAnimal(file);
+                return fileParserAnimal.parseFileToListAnimal(file);
             }
             default -> throw new FileNotSupportedException("This type of file not supported");
         }
-        animals = validateAnimalsByParameters(animals);
-        setCategoryToAnimal(animals);
-        animalRepository.saveAll(animals);
-    }
-
-    private void validateFile(MultipartFile file) {
-        String fileType = file.getOriginalFilename();
-
-        if (isFileNotValid(fileType))
-            throw new FileNotSupportedException("Our application supports only .csv and .xml. Please use these file types.");
-
-        if (file.isEmpty())
-            throw new FileIsEmptyException("Your file is empty. Please send valid files with values.");
-    }
-
-    private boolean isFileNotValid(String fileType) {
-        return !(fileType.endsWith(".csv") || fileType.endsWith(".xml"));
-    }
-
-    private String getFileType(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        String[] fileType = originalFilename.split("\\.");
-        return fileType[1];
     }
 
     private void setCategoryToAnimal(List<Animal> animals) {
-        animals.forEach(a -> a.setCategory(getCategoryByAnimalCost(a.getCost())));
+        CategoryAssignmentContext categoryAssignmentContext = new CategoryAssignmentContext();
+        animals.forEach(a -> a.setCategory(getCategoryByAnimalCost(categoryAssignmentContext, a.getCost())));
     }
 
-    private int getCategoryByAnimalCost(Integer cost) {
-        CategoryAssignmentContext categoryAssignmentContext = new CategoryAssignmentContext();
+    private int getCategoryByAnimalCost(CategoryAssignmentContext categoryAssignmentContext, Integer cost) {
         CategoryStrategy categoryStrategy = categoryAssignmentContext.defineCategoryOfAnimalByCost(cost);
         return categoryStrategy.defineCategoryByAnimalsCost().getCategory();
     }
 
     private List<Animal> validateAnimalsByParameters(List<Animal> animals) {
+        SpecificationValidContext specificationValidContext = new SpecificationValidContext();
         return animals.stream()
-                .filter(this::isAnimalValid)
+                .filter(a -> isAnimalValid(specificationValidContext, a))
                 .toList();
     }
 
-    private boolean isAnimalValid(Animal animal) {
-        SpecificationValidContext specificationValidContext = new SpecificationValidContext();
+    private boolean isAnimalValid(SpecificationValidContext specificationValidContext, Animal animal) {
         return specificationValidContext.isAnimalValid(animal);
     }
 }

@@ -1,4 +1,4 @@
-package avlyakulov.timur.TestTaskPUMB.util.file_parser;
+package avlyakulov.timur.TestTaskPUMB.util.file.file_parser;
 
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import org.springframework.web.multipart.MultipartFile;

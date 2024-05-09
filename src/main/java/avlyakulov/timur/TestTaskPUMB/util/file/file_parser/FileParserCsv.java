@@ -1,4 +1,4 @@
-package avlyakulov.timur.TestTaskPUMB.util.file_parser;
+package avlyakulov.timur.TestTaskPUMB.util.file.file_parser;
 
 import avlyakulov.timur.TestTaskPUMB.dto.csv.AnimalRequestCSV;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
