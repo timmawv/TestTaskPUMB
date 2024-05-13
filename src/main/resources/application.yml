@@ -11,7 +11,7 @@ spring:
     enabled: true
   servlet:
     multipart:
-      max-file-size: 1MB
+      max-file-size: 10MB
 springdoc:
   swagger-ui:
     url: /swagger.yaml
