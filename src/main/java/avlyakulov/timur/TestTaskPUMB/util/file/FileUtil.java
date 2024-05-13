@@ -17,7 +17,7 @@ public class FileUtil {
     }
 
     private FileType defineFileType(MultipartFile file) {
-        String fileType = splitFileType(file);
+        String fileType = splitFileTypeFromFile(file);
         switch (fileType) {
             case "csv" -> {
                 return FileType.CSV;
@@ -29,7 +29,7 @@ public class FileUtil {
         }
     }
 
-    private String splitFileType(MultipartFile file) {
+    private String splitFileTypeFromFile(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String[] fileType = originalFilename.split("\\.");
         return fileType[1];

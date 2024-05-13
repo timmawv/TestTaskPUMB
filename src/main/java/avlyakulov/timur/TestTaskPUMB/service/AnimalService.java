@@ -6,7 +6,6 @@ import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
 import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryAssignmentContext;
-import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryStrategy;
 import avlyakulov.timur.TestTaskPUMB.util.file.FileType;
 import avlyakulov.timur.TestTaskPUMB.util.file.FileUtil;
 import avlyakulov.timur.TestTaskPUMB.util.file.file_parser.FileParserAnimal;
@@ -81,22 +80,13 @@ public class AnimalService {
 
     private void setCategoryToAnimal(List<Animal> animals) {
         CategoryAssignmentContext categoryAssignmentContext = new CategoryAssignmentContext();
-        animals.forEach(a -> a.setCategory(getCategoryByAnimalCost(categoryAssignmentContext, a.getCost())));
-    }
-
-    private int getCategoryByAnimalCost(CategoryAssignmentContext categoryAssignmentContext, Integer cost) {
-        CategoryStrategy categoryStrategy = categoryAssignmentContext.defineCategoryOfAnimalByCost(cost);
-        return categoryStrategy.defineCategoryByAnimalsCost().getCategory();
+        animals.forEach(a -> categoryAssignmentContext.defineCategoryOfAnimalByCost(a.getCost()));
     }
 
     private List<Animal> validateAnimalsByParameters(List<Animal> animals) {
         SpecificationValidContext specificationValidContext = new SpecificationValidContext();
         return animals.stream()
-                .filter(a -> isAnimalValid(specificationValidContext, a))
+                .filter(specificationValidContext::isAnimalValid)
                 .toList();
-    }
-
-    private boolean isAnimalValid(SpecificationValidContext specificationValidContext, Animal animal) {
-        return specificationValidContext.isAnimalValid(animal);
     }
 }

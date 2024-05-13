@@ -1,0 +1,150 @@
+openapi: 3.0.0
+info:
+  title: Specification of Animal Service
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080
+    description: Dev server
+paths:
+  /files/uploads:
+    get:
+      summary: Method to get all animals
+      tags:
+        - Animals
+      operationId: getAllAnimals
+      parameters:
+        - name: sort
+          in: query
+          required: false
+          description: sort by field, by default asc
+          schema:
+            type: string
+          examples:
+            sortNameDefault:
+              summary: sort name default
+              description: sort name ascending by default
+              value: name
+            sortNameAsc:
+              summary: sort name ascending
+              description: sort name ascending by parameter
+              value: name,asc
+            sortNameDesc:
+              summary: sort name descending
+              description: sort name descending by parameter
+              value: name,desc
+            noParameter:
+              summary: no parameter
+              value:
+        - name: category
+          in: query
+          required: false
+          description: filter values by category and value
+          schema:
+            type: integer
+          examples:
+            filterCategoryFirst:
+              summary: filter category first
+              description: filter our values by first category of animal
+              value: 1
+            filterCategorySecond:
+              summary: filter category second
+              description: filter our values by second category of animal
+              value: 2
+            noParameter:
+              summary: no parameter
+              value:
+        - name: type
+          in: query
+          required: false
+          description: filter values by type of animal and value
+          schema:
+            type: string
+          examples:
+            filterDogType:
+              summary: filter type dog
+              description: filter our values by type dog of animal
+              value: dog
+            filterCatType:
+              summary: filter type cat
+              description: filter our values by type cat of animal
+              value: cat
+            noParameter:
+              summary: no parameter
+              value:
+        - name: sex
+          in: query
+          required: false
+          description: filter values by gender of animal and value
+          schema:
+            type: string
+          examples:
+            filterSexMale:
+              summary: filter sex male
+              description: filter our values by sex male of animal
+              value: male
+            filterSexFemale:
+              summary: filter sex female
+              description: filter our values by sex female of animal
+              value: female
+            noParameter:
+              summary: no parameter
+              value:
+
+
+      responses:
+        '200':
+          description: Successful answer with list of animals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Animals"
+        '400':
+          description: Error with parameters in header
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+components:
+  schemas:
+    Animal:
+      type: object
+      required:
+        - name
+        - type
+        - sex
+        - weight
+        - cost
+      properties:
+        name:
+          type: string
+          example: Milo
+        type:
+          type: string
+          example: cat
+        sex:
+          type: string
+          example: male
+          description: gender of animal
+        weight:
+          type: integer
+          example: 40
+        cost:
+          type: integer
+          example: 51
+        category:
+          type: integer
+          example: 3
+    Animals:
+      type: array
+      items:
+        $ref: "#/components/schemas/Animal"
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "You have error with your field category please enter valid field for category example: 1,2,3"
