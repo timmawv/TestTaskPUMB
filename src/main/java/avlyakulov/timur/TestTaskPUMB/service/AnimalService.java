@@ -6,6 +6,7 @@ import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
 import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryAssignmentContext;
+import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryStrategy;
 import avlyakulov.timur.TestTaskPUMB.util.file.FileType;
 import avlyakulov.timur.TestTaskPUMB.util.file.FileUtil;
 import avlyakulov.timur.TestTaskPUMB.util.file.file_parser.FileParserAnimal;
@@ -80,7 +81,10 @@ public class AnimalService {
 
     private void setCategoryToAnimal(List<Animal> animals) {
         CategoryAssignmentContext categoryAssignmentContext = new CategoryAssignmentContext();
-        animals.forEach(a -> categoryAssignmentContext.defineCategoryOfAnimalByCost(a.getCost()));
+        animals.forEach(a -> {
+            CategoryStrategy categoryStrategy = categoryAssignmentContext.defineCategoryOfAnimalByCost(a.getCost());
+            a.setCategory(categoryStrategy.defineCategoryByAnimalsCost().getCategory());
+        });
     }
 
     private List<Animal> validateAnimalsByParameters(List<Animal> animals) {

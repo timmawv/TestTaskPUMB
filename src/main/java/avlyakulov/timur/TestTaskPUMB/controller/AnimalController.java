@@ -7,7 +7,9 @@ import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.service.AnimalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +35,7 @@ public class AnimalController {
     }
 
     @PostMapping
-    public ResponseEntity<List<AnimalResponse>> uploadAnimals(@RequestPart(value = "file", required = false) MultipartFile file) {
+    public ResponseEntity<List<AnimalResponse>> uploadAnimals(@RequestBody MultipartFile file) {
         List<Animal> animals = animalService.parseFile(file);
         log.info("One file was uploaded");
         return ResponseEntity.ok(animalMapper.mapListAnimalToAnimalResponse(animals));

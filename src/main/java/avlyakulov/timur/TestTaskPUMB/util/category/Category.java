@@ -11,5 +11,5 @@ public enum Category {
     THIRD_CATEGORY(3),
     FOURTH_CATEGORY(4);
 
-    private final int category;
+    private final Integer category;
 }

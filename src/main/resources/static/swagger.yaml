@@ -89,8 +89,6 @@ paths:
             noParameter:
               summary: no parameter
               value:
-
-
       responses:
         '200':
           description: Successful answer with list of animals
@@ -100,6 +98,35 @@ paths:
                 $ref: "#/components/schemas/Animals"
         '400':
           description: Error with parameters in header
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: adding to database animals from file
+      tags:
+        - Animals
+      operationId: createAnimals
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                # 'file' will be the field name in this multipart request
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful answer with created list of animals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Animals"
+        '400':
+          description: Error with type of file or file is empty or not attach. Application supports only csv and xml formats
           content:
             application/json:
               schema:
@@ -147,4 +174,4 @@ components:
       properties:
         message:
           type: string
-          example: "You have error with your field category please enter valid field for category example: 1,2,3"
+          example: "You have error"
