@@ -1,6 +1,7 @@
 package avlyakulov.timur.TestTaskPUMB.service;
 
 import avlyakulov.timur.TestTaskPUMB.dto.AnimalSpecs;
+import avlyakulov.timur.TestTaskPUMB.dto.RequestParamDto;
 import avlyakulov.timur.TestTaskPUMB.exception.FieldSortException;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
@@ -32,21 +33,19 @@ public class AnimalService {
 
     private final AnimalRepository animalRepository;
 
-    public List<Animal> getAnimals(Map<String, String> searchCriteria, Sort sort) {
+    public List<Animal> getAnimals(RequestParamDto requestParamDto, Sort sort) {
         Specification<Animal> spec = Specification.where(null);
 
-        if (StringUtils.hasLength(searchCriteria.get("type")))
-            spec = spec.and(AnimalSpecs.hasType(searchCriteria.get("type")));
+        if (requestParamDto.getType() != null)
+            spec = spec.and(AnimalSpecs.hasType(requestParamDto.getType()));
 
-        try {
-            if (StringUtils.hasLength(searchCriteria.get("category")))
-                spec = spec.and(AnimalSpecs.hasCategory(Integer.parseInt(searchCriteria.get("category"))));
-        } catch (NumberFormatException ex) {
-            throw new FileNotSupportedException("You have error with your field category please enter valid field for category example: 1,2,3");
-        }
 
-        if (StringUtils.hasLength(searchCriteria.get("sex")))
-            spec = spec.and(AnimalSpecs.hasSex(searchCriteria.get("sex")));
+        if (requestParamDto.getCategory() != null)
+            spec = spec.and(AnimalSpecs.hasCategory(requestParamDto.getCategory()));
+
+
+        if (requestParamDto.getSex() != null)
+            spec = spec.and(AnimalSpecs.hasSex(requestParamDto.getSex()));
 
         try {
             return animalRepository.findAll(spec, sort);
