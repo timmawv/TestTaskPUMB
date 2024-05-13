@@ -2,6 +2,7 @@ package avlyakulov.timur.TestTaskPUMB.controller;
 
 import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
 import avlyakulov.timur.TestTaskPUMB.dto.ApiMessageResponse;
+import avlyakulov.timur.TestTaskPUMB.dto.RequestParamDto;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.service.AnimalService;
@@ -28,9 +29,8 @@ public class AnimalController {
     private final AnimalMapper animalMapper;
 
     @GetMapping
-    public ResponseEntity<List<AnimalResponse>> getAnimals(@RequestParam Map<String, String> searchCriteria, Sort sort) {
-        //todo make param dto not map
-        List<Animal> animals = animalService.getAnimals(searchCriteria, sort);
+    public ResponseEntity<List<AnimalResponse>> getAnimals(RequestParamDto requestParamDto, Sort sort) {
+        List<Animal> animals = animalService.getAnimals(requestParamDto, sort);
         return ResponseEntity.ok(animalMapper.mapListAnimalToAnimalResponse(animals));
     }
 

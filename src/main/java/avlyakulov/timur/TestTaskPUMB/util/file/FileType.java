@@ -1,7 +1,6 @@
 package avlyakulov.timur.TestTaskPUMB.util.file;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public enum FileType {
