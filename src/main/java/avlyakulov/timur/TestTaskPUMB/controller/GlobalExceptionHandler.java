@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,5 +24,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiMessageResponse> handleMaxSizeException() {
         return ResponseEntity.badRequest().body(new ApiMessageResponse("You file is too large. Max upload size is " + maxUploadSize));
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ApiMessageResponse> handleMissFileException() {
+        return ResponseEntity.badRequest().body(new ApiMessageResponse("You didn't attach any file. Please attach xml or csv file"));
     }
 }

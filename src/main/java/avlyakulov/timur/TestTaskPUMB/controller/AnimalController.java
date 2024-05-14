@@ -31,7 +31,7 @@ public class AnimalController {
     }
 
     @PostMapping
-    public ResponseEntity<List<AnimalResponse>> uploadAnimals(@RequestBody MultipartFile file) {
+    public ResponseEntity<List<AnimalResponse>> uploadAnimals(@RequestPart(name = "file") MultipartFile file) {
         List<Animal> animals = animalService.parseFile(file);
         log.info("One file was uploaded");
         return ResponseEntity.ok(animalMapper.mapListAnimalToAnimalResponse(animals));
