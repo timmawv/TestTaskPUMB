@@ -31,19 +31,9 @@ public class AnimalService {
     private final AnimalRepository animalRepository;
 
     public List<Animal> getAnimals(RequestParamDto requestParamDto, Sort sort) {
-        Specification<Animal> spec = Specification.where(null);
-
-        if (requestParamDto.getType() != null)
-            spec = spec.and(AnimalSpecs.hasType(requestParamDto.getType()));
-
-        if (requestParamDto.getCategory() != null)
-            spec = spec.and(AnimalSpecs.hasCategory(requestParamDto.getCategory()));
-
-        if (requestParamDto.getSex() != null)
-            spec = spec.and(AnimalSpecs.hasSex(requestParamDto.getSex()));
-
+        Specification<Animal> animalSpecification = configureSpecificationWithDto(requestParamDto);
         try {
-            return animalRepository.findAll(spec, sort);
+            return animalRepository.findAll(animalSpecification, sort);
         } catch (PropertyReferenceException ex) {
             throw new FieldSortException(ex.getMessage());
         }
@@ -83,5 +73,20 @@ public class AnimalService {
         return animals.stream()
                 .filter(specificationValidContext::isAnimalValid)
                 .toList();
+    }
+
+    private Specification<Animal> configureSpecificationWithDto(RequestParamDto requestParamDto) {
+        Specification<Animal> spec = Specification.where(null);
+
+        if (requestParamDto.getType() != null)
+            spec = spec.and(AnimalSpecs.hasType(requestParamDto.getType()));
+
+        if (requestParamDto.getCategory() != null)
+            spec = spec.and(AnimalSpecs.hasCategory(requestParamDto.getCategory()));
+
+        if (requestParamDto.getSex() != null)
+            spec = spec.and(AnimalSpecs.hasSex(requestParamDto.getSex()));
+
+        return spec;
     }
 }
