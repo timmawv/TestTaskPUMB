@@ -31,7 +31,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/files/uploads?sort_by=weight&type_sort=desc&filter_field=sex&filter_value=female",
+					"raw": "http://localhost:8080/files/uploads",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -43,20 +43,24 @@
 					],
 					"query": [
 						{
-							"key": "sort_by",
-							"value": "weight"
+							"key": "sort",
+							"value": "name",
+							"disabled": true
 						},
 						{
-							"key": "type_sort",
-							"value": "desc"
+							"key": "type",
+							"value": "dog",
+							"disabled": true
 						},
 						{
-							"key": "filter_field",
-							"value": "sex"
+							"key": "category",
+							"value": "1",
+							"disabled": true
 						},
 						{
-							"key": "filter_value",
-							"value": "female"
+							"key": "sex",
+							"value": "male",
+							"disabled": true
 						}
 					]
 				}
