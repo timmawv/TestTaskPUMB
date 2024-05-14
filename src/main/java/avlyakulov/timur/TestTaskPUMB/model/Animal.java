@@ -2,15 +2,14 @@ package avlyakulov.timur.TestTaskPUMB.model;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "animals")
+@ToString
+@EqualsAndHashCode(exclude = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Animal {
@@ -36,4 +35,13 @@ public class Animal {
 
     @Column(nullable = false)
     private Integer category;
+
+    public Animal(String name, String type, String sex, Integer weight, Integer cost, Integer category) {
+        this.name = name;
+        this.type = type;
+        this.sex = sex;
+        this.weight = weight;
+        this.cost = cost;
+        this.category = category;
+    }
 }

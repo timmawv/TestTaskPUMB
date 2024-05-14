@@ -36,10 +36,8 @@ public class AnimalService {
         if (requestParamDto.getType() != null)
             spec = spec.and(AnimalSpecs.hasType(requestParamDto.getType()));
 
-
         if (requestParamDto.getCategory() != null)
             spec = spec.and(AnimalSpecs.hasCategory(requestParamDto.getCategory()));
-
 
         if (requestParamDto.getSex() != null)
             spec = spec.and(AnimalSpecs.hasSex(requestParamDto.getSex()));

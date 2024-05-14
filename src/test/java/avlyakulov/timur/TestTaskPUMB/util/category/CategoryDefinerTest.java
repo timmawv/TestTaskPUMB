@@ -3,7 +3,6 @@ package avlyakulov.timur.TestTaskPUMB.util.category;
 import avlyakulov.timur.TestTaskPUMB.exception.CategoryNumberException;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -62,9 +61,10 @@ class CategoryDefinerTest {
         assertThat(underTest.getCategory()).isEqualTo(4);
     }
 
-    @Test
-    void categorizeAnimal_throwException_invalidCost() {
-        underTest.setCost(-100);
+    @ValueSource(ints = {-10_000, -100, -1})
+    @ParameterizedTest
+    void categorizeAnimal_throwException_invalidCost(Integer cost) {
+        underTest.setCost(cost);
 
         assertThrows(CategoryNumberException.class, () -> categoryDefiner.categorizeAnimal(underTest));
     }

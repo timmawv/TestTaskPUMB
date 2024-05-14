@@ -17,21 +17,13 @@ public class FileUtil {
     }
 
     private FileType defineFileType(MultipartFile file) {
-        String fileType = splitFileTypeFromFile(file);
-        switch (fileType) {
-            case "csv" -> {
-                return FileType.CSV;
-            }
-            case "xml" -> {
-                return FileType.XML;
-            }
-            default -> throw new FileNotSupportedException("Our application supports only csv and xml files.");
+        String fileName = file.getOriginalFilename();
+        if (fileName.endsWith(FileType.CSV.getFileType())) {
+            return FileType.CSV;
+        } else if (fileName.endsWith(FileType.XML.getFileType())) {
+            return FileType.XML;
+        } else {
+            throw new FileNotSupportedException("Our application supports only csv and xml files.");
         }
-    }
-
-    private String splitFileTypeFromFile(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        String[] fileType = originalFilename.split("\\.");
-        return fileType[1];
     }
 }

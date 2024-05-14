@@ -19,8 +19,7 @@ public class SpecificationValidContext {
     }
 
     public boolean isAnimalValid(Animal animal) {
-        return specifications
-                .stream()
+        return specifications.stream()
                 .allMatch(s -> s.isSatisfied(animal));
     }
 }
