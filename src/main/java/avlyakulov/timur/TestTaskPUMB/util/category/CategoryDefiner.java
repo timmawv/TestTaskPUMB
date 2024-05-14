@@ -1,5 +1,6 @@
 package avlyakulov.timur.TestTaskPUMB.util.category;
 
+import avlyakulov.timur.TestTaskPUMB.exception.CategoryNumberException;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 
 import java.util.ArrayList;
@@ -9,11 +10,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class CategoryDefiner {
-    private List<Map.Entry<Predicate<Animal>, Consumer<Animal>>> conditions = new ArrayList<>();
+    private final List<Map.Entry<Predicate<Animal>, Consumer<Animal>>> conditions = new ArrayList<>();
 
     {
         conditions.add(Map.entry(
-                (animal) -> animal.getCost() > 0 && animal.getCost() <= 20,
+                (animal) -> animal.getCost() >= 0 && animal.getCost() <= 20,
                 (animal) -> animal.setCategory(1)
         ));
 
@@ -37,6 +38,8 @@ public class CategoryDefiner {
         conditions.stream()
                 .filter(entry -> entry.getKey().test(animal))
                 .findFirst()
-                .ifPresent(entry -> entry.getValue().accept(animal));
+                .ifPresentOrElse(entry -> entry.getValue().accept(animal), () -> {
+                    throw new CategoryNumberException("Such condition for category doesn't exist, check animal's cost");
+                });
     }
 }

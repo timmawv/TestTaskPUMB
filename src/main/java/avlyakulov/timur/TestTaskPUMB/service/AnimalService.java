@@ -7,8 +7,6 @@ import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
 import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
 import avlyakulov.timur.TestTaskPUMB.util.category.CategoryDefiner;
-import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryAssignmentContext;
-import avlyakulov.timur.TestTaskPUMB.util.category.strategy.CategoryStrategy;
 import avlyakulov.timur.TestTaskPUMB.util.file.FileType;
 import avlyakulov.timur.TestTaskPUMB.util.file.FileUtil;
 import avlyakulov.timur.TestTaskPUMB.util.file.file_parser.FileParserAnimal;
@@ -21,11 +19,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
