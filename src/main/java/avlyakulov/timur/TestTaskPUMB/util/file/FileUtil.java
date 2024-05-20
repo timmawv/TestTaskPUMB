@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class FileUtil {
 
-    public FileType getFileType(MultipartFile file) {
+    public static FileType getFileType(MultipartFile file) {
         if (file == null)
             throw new FileIsEmptyException("You didn't attach any file.");
 
@@ -16,7 +16,7 @@ public class FileUtil {
         return defineFileType(file);
     }
 
-    private FileType defineFileType(MultipartFile file) {
+    private static FileType defineFileType(MultipartFile file) {
         String fileName = file.getOriginalFilename();
         if (fileName.endsWith(FileType.CSV.getFileType())) {
             return FileType.CSV;

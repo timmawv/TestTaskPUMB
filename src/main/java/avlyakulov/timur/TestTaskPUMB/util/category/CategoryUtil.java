@@ -1,7 +1,7 @@
 package avlyakulov.timur.TestTaskPUMB.util.category;
 
 import avlyakulov.timur.TestTaskPUMB.exception.CategoryNumberException;
-import avlyakulov.timur.TestTaskPUMB.model.Animal;
+import avlyakulov.timur.TestTaskPUMB.entity.AnimalEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class CategoryDefiner {
-    private final List<Map.Entry<Predicate<Animal>, Consumer<Animal>>> conditions = new ArrayList<>();
+public class CategoryUtil {
+    private static final List<Map.Entry<Predicate<AnimalEntity>, Consumer<AnimalEntity>>> conditions = new ArrayList<>();
 
-    {
+     static  {
         conditions.add(Map.entry(
                 (animal) -> animal.getCost() >= 0 && animal.getCost() <= 20,
                 (animal) -> animal.setCategory(1)
@@ -34,11 +34,11 @@ public class CategoryDefiner {
         ));
     }
 
-    public void categorizeAnimal(Animal animal) {
+    public static void categorizeAnimal(AnimalEntity animalEntity) {
         conditions.stream()
-                .filter(entry -> entry.getKey().test(animal))
+                .filter(entry -> entry.getKey().test(animalEntity))
                 .findFirst()
-                .ifPresentOrElse(entry -> entry.getValue().accept(animal), () -> {
+                .ifPresentOrElse(entry -> entry.getValue().accept(animalEntity), () -> {
                     throw new CategoryNumberException("Such condition for category doesn't exist, check animal's cost");
                 });
     }

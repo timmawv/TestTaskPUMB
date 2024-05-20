@@ -1,11 +1,11 @@
 package avlyakulov.timur.TestTaskPUMB.util.specification.specifitations;
 
-import avlyakulov.timur.TestTaskPUMB.model.Animal;
+import avlyakulov.timur.TestTaskPUMB.entity.AnimalEntity;
 import avlyakulov.timur.TestTaskPUMB.util.specification.Specification;
 
-public class TypeSpecification implements Specification<Animal> {
+public class TypeSpecification implements Specification<AnimalEntity> {
     @Override
-    public boolean isSatisfied(Animal item) {
+    public boolean isSatisfied(AnimalEntity item) {
         return item.getType() != null && !item.getType().isBlank();
     }
 }

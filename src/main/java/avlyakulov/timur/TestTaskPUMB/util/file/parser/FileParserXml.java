@@ -1,14 +1,16 @@
-package avlyakulov.timur.TestTaskPUMB.util.file.file_parser;
+package avlyakulov.timur.TestTaskPUMB.util.file.parser;
 
 import avlyakulov.timur.TestTaskPUMB.dto.xml.AnimalRequestXML;
 import avlyakulov.timur.TestTaskPUMB.dto.xml.AnimalXML;
+import avlyakulov.timur.TestTaskPUMB.entity.AnimalEntity;
 import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
-import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,18 +18,20 @@ import java.io.InputStream;
 import java.util.List;
 
 @Slf4j
-public class FileParserXml implements FileParserAnimal {
+@Component
+@Qualifier("xmlParser")
+public class FileParserXml implements FileParser {
 
     private final AnimalMapper animalMapper = Mappers.getMapper(AnimalMapper.class);
 
     @Override
-    public List<Animal> parseFileToListAnimal(MultipartFile file) {
+    public List<AnimalEntity> parseFileToListAnimal(MultipartFile file) {
         return parseXmlFile(file);
     }
 
-    private List<Animal> parseXmlFile(MultipartFile file) {
+    private List<AnimalEntity> parseXmlFile(MultipartFile file) {
         List<AnimalXML> animalXML = parseToListAnimalXMLFromFile(file);
-        return animalMapper.mapListAnimalXMLtoListAnimal(animalXML);
+        return animalMapper.mapListXMLtoListAnimal(animalXML);
     }
 
     private List<AnimalXML> parseToListAnimalXMLFromFile(MultipartFile file) {

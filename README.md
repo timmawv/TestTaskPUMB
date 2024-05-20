@@ -30,7 +30,7 @@ First you need to clone the repository:<br>
 Just put this command and app will start<br>
 `docker compose up -d`<br>
 Run Dockerfile<br>
-`docker run --rm  -e DB_URL=jdbc:postgresql://localhost:5432/animals_db --name animals -p 8080:8080 animals_uploader`
+`docker run --rm  -e DB_URL=jdbc:postgresql://localhost:5432/animals_db --name animalEntities -p 8080:8080 animals_uploader`
 
 ## How to launch project without Docker
 First you need to clone the repository:<br>

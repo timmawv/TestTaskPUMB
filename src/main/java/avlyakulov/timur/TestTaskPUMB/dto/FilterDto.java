@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RequestParamDto {
+public class FilterDto {
 
     private String type;
 

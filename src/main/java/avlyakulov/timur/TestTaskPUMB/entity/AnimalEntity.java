@@ -1,4 +1,4 @@
-package avlyakulov.timur.TestTaskPUMB.model;
+package avlyakulov.timur.TestTaskPUMB.entity;
 
 
 import jakarta.persistence.*;
@@ -12,7 +12,7 @@ import lombok.*;
 @EqualsAndHashCode(exclude = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Animal {
+public class AnimalEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +36,7 @@ public class Animal {
     @Column(nullable = false)
     private Integer category;
 
-    public Animal(String name, String type, String sex, Integer weight, Integer cost, Integer category) {
+    public AnimalEntity(String name, String type, String sex, Integer weight, Integer cost, Integer category) {
         this.name = name;
         this.type = type;
         this.sex = sex;

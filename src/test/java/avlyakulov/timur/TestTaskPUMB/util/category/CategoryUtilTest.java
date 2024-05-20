@@ -1,7 +1,7 @@
 package avlyakulov.timur.TestTaskPUMB.util.category;
 
+import avlyakulov.timur.TestTaskPUMB.entity.AnimalEntity;
 import avlyakulov.timur.TestTaskPUMB.exception.CategoryNumberException;
-import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -9,16 +9,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class CategoryDefinerTest {
+class CategoryUtilTest {
 
-    private CategoryDefiner categoryDefiner;
-
-    private Animal underTest;
+    private AnimalEntity underTest;
 
     @BeforeEach
     void setUp() {
-        categoryDefiner = new CategoryDefiner();
-        underTest = new Animal();
+        underTest = new AnimalEntity();
     }
 
     @ValueSource(ints = {0, 20})
@@ -26,7 +23,7 @@ class CategoryDefinerTest {
     void categorizeAnimal_animalSetFirstCategory(Integer cost) {
         underTest.setCost(cost);
 
-        categoryDefiner.categorizeAnimal(underTest);
+        CategoryUtil.categorizeAnimal(underTest);
 
         assertThat(underTest.getCategory()).isEqualTo(1);
     }
@@ -36,7 +33,7 @@ class CategoryDefinerTest {
     void categorizeAnimal_animalSetSecondCategory(Integer cost) {
         underTest.setCost(cost);
 
-        categoryDefiner.categorizeAnimal(underTest);
+        CategoryUtil.categorizeAnimal(underTest);
 
         assertThat(underTest.getCategory()).isEqualTo(2);
     }
@@ -46,7 +43,7 @@ class CategoryDefinerTest {
     void categorizeAnimal_animalSetThirdCategory(Integer cost) {
         underTest.setCost(cost);
 
-        categoryDefiner.categorizeAnimal(underTest);
+        CategoryUtil.categorizeAnimal(underTest);
 
         assertThat(underTest.getCategory()).isEqualTo(3);
     }
@@ -56,7 +53,7 @@ class CategoryDefinerTest {
     void categorizeAnimal_animalSetFourthCategory(Integer cost) {
         underTest.setCost(cost);
 
-        categoryDefiner.categorizeAnimal(underTest);
+        CategoryUtil.categorizeAnimal(underTest);
 
         assertThat(underTest.getCategory()).isEqualTo(4);
     }
@@ -66,6 +63,6 @@ class CategoryDefinerTest {
     void categorizeAnimal_throwException_invalidCost(Integer cost) {
         underTest.setCost(cost);
 
-        assertThrows(CategoryNumberException.class, () -> categoryDefiner.categorizeAnimal(underTest));
+        assertThrows(CategoryNumberException.class, () -> CategoryUtil.categorizeAnimal(underTest));
     }
 }

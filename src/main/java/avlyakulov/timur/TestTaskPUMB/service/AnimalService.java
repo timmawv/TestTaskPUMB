@@ -1,20 +1,22 @@
 package avlyakulov.timur.TestTaskPUMB.service;
 
+import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
 import avlyakulov.timur.TestTaskPUMB.dto.AnimalSpecs;
-import avlyakulov.timur.TestTaskPUMB.dto.RequestParamDto;
+import avlyakulov.timur.TestTaskPUMB.dto.FilterDto;
+import avlyakulov.timur.TestTaskPUMB.entity.AnimalEntity;
 import avlyakulov.timur.TestTaskPUMB.exception.FieldSortException;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
-import avlyakulov.timur.TestTaskPUMB.model.Animal;
+import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
-import avlyakulov.timur.TestTaskPUMB.util.category.CategoryDefiner;
+import avlyakulov.timur.TestTaskPUMB.util.category.CategoryUtil;
 import avlyakulov.timur.TestTaskPUMB.util.file.FileType;
 import avlyakulov.timur.TestTaskPUMB.util.file.FileUtil;
-import avlyakulov.timur.TestTaskPUMB.util.file.file_parser.FileParserAnimal;
-import avlyakulov.timur.TestTaskPUMB.util.file.file_parser.FileParserCsv;
-import avlyakulov.timur.TestTaskPUMB.util.file.file_parser.FileParserXml;
-import avlyakulov.timur.TestTaskPUMB.util.specification.SpecificationValidContext;
-import lombok.RequiredArgsConstructor;
+import avlyakulov.timur.TestTaskPUMB.util.file.parser.FileParser;
+import avlyakulov.timur.TestTaskPUMB.util.specification.SpecificationContextUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.mapping.PropertyReferenceException;
@@ -25,67 +27,75 @@ import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class AnimalService {
 
     private final AnimalRepository animalRepository;
 
-    public List<Animal> getAnimals(RequestParamDto requestParamDto, Sort sort) {
-        Specification<Animal> animalSpecification = configureSpecificationWithDto(requestParamDto);
+    private final FileParser csvParser;
+
+    private final FileParser xmlParser;
+
+    @Autowired
+    public AnimalService(AnimalRepository animalRepository, @Qualifier("csvParser") FileParser csvParser, @Qualifier("xmlParser") FileParser xmlParser) {
+        this.animalRepository = animalRepository;
+        this.csvParser = csvParser;
+        this.xmlParser = xmlParser;
+    }
+
+    private final AnimalMapper animalMapper = Mappers.getMapper(AnimalMapper.class);
+
+    public List<AnimalResponse> getAnimals(FilterDto filterDto, Sort sort) {
+        Specification<AnimalEntity> animalSpecification = configureSpecificationWithDto(filterDto);
         try {
-            return animalRepository.findAll(animalSpecification, sort);
+            List<AnimalEntity> animals = animalRepository.findAll(animalSpecification, sort);
+            return animalMapper.mapListAnimalToListAnimalResponse(animals);
         } catch (PropertyReferenceException ex) {
             throw new FieldSortException(ex.getMessage());
         }
     }
 
-    public List<Animal> parseFile(MultipartFile file) {
-        List<Animal> animals = parseFileToAnimalEntities(file);
-        animals = validateAnimalsByParameters(animals);
-        setCategoryToAnimal(animals);
-        return animalRepository.saveAll(animals);
+    public List<AnimalResponse> parseFile(MultipartFile file) {
+        List<AnimalEntity> animalEntities = parseFileToAnimalEntities(file);
+        animalEntities = validateAnimalsByParameters(animalEntities);
+        setCategoryToAnimal(animalEntities);
+        List<AnimalEntity> animals = animalRepository.saveAll(animalEntities);
+        return animalMapper.mapListAnimalToListAnimalResponse(animals);
     }
 
-    private List<Animal> parseFileToAnimalEntities(MultipartFile file) {
-        FileUtil fileUtil = new FileUtil();
-        FileType fileType = fileUtil.getFileType(file);
-        FileParserAnimal fileParserAnimal;
+    private List<AnimalEntity> parseFileToAnimalEntities(MultipartFile file) {
+        FileType fileType = FileUtil.getFileType(file);
         switch (fileType) {
             case XML -> {
-                fileParserAnimal = new FileParserXml();
-                return fileParserAnimal.parseFileToListAnimal(file);
+                return xmlParser.parseFileToListAnimal(file);
             }
             case CSV -> {
-                fileParserAnimal = new FileParserCsv();
-                return fileParserAnimal.parseFileToListAnimal(file);
+                return csvParser.parseFileToListAnimal(file);
             }
             default -> throw new FileNotSupportedException("This type of file not supported");
         }
     }
 
-    private void setCategoryToAnimal(List<Animal> animals) {
-        CategoryDefiner categoryDefiner = new CategoryDefiner();
-        animals.forEach(categoryDefiner::categorizeAnimal);
+    private void setCategoryToAnimal(List<AnimalEntity> animalEntities) {
+        animalEntities.forEach(CategoryUtil::categorizeAnimal);
     }
 
-    private List<Animal> validateAnimalsByParameters(List<Animal> animals) {
-        SpecificationValidContext specificationValidContext = new SpecificationValidContext();
-        return animals.stream()
-                .filter(specificationValidContext::isAnimalValid)
+    private List<AnimalEntity> validateAnimalsByParameters(List<AnimalEntity> animalEntities) {
+        return animalEntities.stream()
+                .filter(SpecificationContextUtil::isAnimalValid)
                 .toList();
     }
 
-    private Specification<Animal> configureSpecificationWithDto(RequestParamDto requestParamDto) {
-        Specification<Animal> spec = Specification.where(null);
+    private Specification<AnimalEntity> configureSpecificationWithDto(FilterDto filterDto) {
+        Specification<AnimalEntity> spec = Specification.where(null);
 
-        if (requestParamDto.getType() != null)
-            spec = spec.and(AnimalSpecs.hasType(requestParamDto.getType()));
+        if (filterDto.getType() != null)
+            spec = spec.and(AnimalSpecs.hasType(filterDto.getType()));
 
-        if (requestParamDto.getCategory() != null)
-            spec = spec.and(AnimalSpecs.hasCategory(requestParamDto.getCategory()));
+        if (filterDto.getCategory() != null)
+            spec = spec.and(AnimalSpecs.hasCategory(filterDto.getCategory()));
 
-        if (requestParamDto.getSex() != null)
-            spec = spec.and(AnimalSpecs.hasSex(requestParamDto.getSex()));
+        if (filterDto.getSex() != null)
+            spec = spec.and(AnimalSpecs.hasSex(filterDto.getSex()));
 
         return spec;
     }

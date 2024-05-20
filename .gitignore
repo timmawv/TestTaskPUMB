@@ -4,7 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 commands.txt
-animals.csv
+animalEntities.csv
 src/main/java/avlyakulov/timur/TestTaskPUMB/test
 
 ### STS ###

@@ -1,9 +1,7 @@
 package avlyakulov.timur.TestTaskPUMB.controller;
 
 import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
-import avlyakulov.timur.TestTaskPUMB.dto.RequestParamDto;
-import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
-import avlyakulov.timur.TestTaskPUMB.model.Animal;
+import avlyakulov.timur.TestTaskPUMB.dto.FilterDto;
 import avlyakulov.timur.TestTaskPUMB.service.AnimalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,18 +20,16 @@ public class AnimalController {
 
     private final AnimalService animalService;
 
-    private final AnimalMapper animalMapper;
-
     @GetMapping
-    public ResponseEntity<List<AnimalResponse>> getAnimals(RequestParamDto requestParamDto, Sort sort) {
-        List<Animal> animals = animalService.getAnimals(requestParamDto, sort);
-        return ResponseEntity.ok(animalMapper.mapListAnimalToAnimalResponse(animals));
+    public ResponseEntity<List<AnimalResponse>> getAll(FilterDto filterDto, Sort sort) {
+        List<AnimalResponse> animals = animalService.getAnimals(filterDto, sort);
+        return ResponseEntity.ok(animals);
     }
 
     @PostMapping
-    public ResponseEntity<List<AnimalResponse>> uploadAnimals(@RequestPart(name = "file") MultipartFile file) {
-        List<Animal> animals = animalService.parseFile(file);
+    public ResponseEntity<List<AnimalResponse>> uploadAll(@RequestPart(name = "file") MultipartFile file) {
+        List<AnimalResponse> animals = animalService.parseFile(file);
         log.info("One file was uploaded");
-        return ResponseEntity.ok(animalMapper.mapListAnimalToAnimalResponse(animals));
+        return ResponseEntity.ok(animals);
     }
 }

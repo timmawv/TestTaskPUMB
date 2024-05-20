@@ -1,9 +1,11 @@
 package avlyakulov.timur.TestTaskPUMB.service;
 
-import avlyakulov.timur.TestTaskPUMB.dto.RequestParamDto;
+import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
+import avlyakulov.timur.TestTaskPUMB.dto.FilterDto;
+import avlyakulov.timur.TestTaskPUMB.entity.AnimalEntity;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
-import avlyakulov.timur.TestTaskPUMB.model.Animal;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
+import avlyakulov.timur.TestTaskPUMB.util.file.parser.FileParser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -20,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -30,104 +31,75 @@ class AnimalServiceTest {
     @Mock
     private AnimalRepository animalRepository;
 
+    @Mock
+    private FileParser fileParser;
+
     @Captor
-    ArgumentCaptor<List<Animal>> animalCaptor;
+    ArgumentCaptor<List<AnimalEntity>> animalCaptor;
 
     @InjectMocks
     private AnimalService animalService;
 
-    private final String csvFileContent = """
-            Name,Type,Sex,Weight,Cost
-            Buddy,cat,female,41,78
-            Cooper,,female,46,23
-            Duke,cat,male,33,108
-            """;
+    private final String csvFileContent = " ";
 
-    private List<Animal> listOfCsvFileAnimals = List.of(new Animal("Buddy", "cat", "female", 41, 78, 4),
-            new Animal("Duke", "cat", "male", 33, 108, 4));
+    private List<AnimalEntity> listOfCsvFileAnimal = List.of(new AnimalEntity("Buddy", "cat", "female", 41, 78, 4),
+            new AnimalEntity("Duke", "cat", "male", 33, 108, 4));
 
-    private final String xmlFileContent = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <animals>
-                <animal>
-                    <name>Milo</name>
-                    <type>cat</type>
-                    <sex>male</sex>
-                    <weight>40</weight>
-                    <cost>51</cost>
-                </animal>
-                <animal>
-                    <type>dog</type>
-                    <sex>male</sex>
-                    <weight>9</weight>
-                    <cost>67</cost>
-                </animal>
-                <animal>
-                    <name>Simon</name>
-                    <type>dog</type>
-                    <sex>male</sex>
-                    <weight>45</weight>
-                    <cost>17</cost>
-                </animal>
-            </animals>     
-            """;
+    private final String xmlFileContent = " ";
 
-    private List<Animal> listOfXmlFileAnimals = List.of(new Animal("Milo", "cat", "male", 40, 51, 3),
-            new Animal("Simon", "dog", "male", 45, 17, 1));
+    private List<AnimalEntity> listOfXmlFileAnimal = List.of(new AnimalEntity("Milo", "cat", "male", 40, 51, 3),
+            new AnimalEntity("Simon", "dog", "male", 45, 17, 1));
 
     @Test
     void parseFile_parseCsvFile() {
-        MultipartFile fileCsv = new MockMultipartFile("animals", "animals.csv", "text/csv", csvFileContent.getBytes());
+        MultipartFile fileCsv = new MockMultipartFile("animal", "animal.csv", "text/csv", csvFileContent.getBytes());
+        doReturn(listOfCsvFileAnimal).when(fileParser).parseFileToListAnimal(fileCsv);
 
         animalService.parseFile(fileCsv);
 
         verify(animalRepository, times(1)).saveAll(animalCaptor.capture());
-        List<Animal> animalCaptorValue = animalCaptor.getValue();
-        assertThat(animalCaptorValue).containsExactlyInAnyOrderElementsOf(listOfCsvFileAnimals);
+        List<AnimalEntity> animalEntityCaptorValue = animalCaptor.getValue();
+        assertThat(animalEntityCaptorValue).containsExactlyInAnyOrderElementsOf(listOfCsvFileAnimal);
     }
 
     @Test
     void parseFile_parseXmlFile() {
-        MultipartFile fileXml = new MockMultipartFile("animals", "animals.xml", "text/xml", xmlFileContent.getBytes());
+        MultipartFile fileXml = new MockMultipartFile("animal", "animal.xml", "text/xml", xmlFileContent.getBytes());
+        doReturn(listOfXmlFileAnimal).when(fileParser).parseFileToListAnimal(fileXml);
 
         animalService.parseFile(fileXml);
 
         verify(animalRepository, times(1)).saveAll(animalCaptor.capture());
-        List<Animal> animalCaptorValue = animalCaptor.getValue();
-        assertThat(animalCaptorValue).containsExactlyInAnyOrderElementsOf(listOfXmlFileAnimals);
+        List<AnimalEntity> animalEntityCaptorValue = animalCaptor.getValue();
+        assertThat(animalEntityCaptorValue).containsExactlyInAnyOrderElementsOf(listOfXmlFileAnimal);
     }
 
     @Test
     void parseFile_throwException_fileNotSupported() {
-        MultipartFile fileNotSupported = new MockMultipartFile("animals", "animals.pdf", "text/pdf", csvFileContent.getBytes());
+        MultipartFile fileNotSupported = new MockMultipartFile("animal", "animal.pdf", "text/pdf", csvFileContent.getBytes());
 
         assertThrows(FileNotSupportedException.class, () -> animalService.parseFile(fileNotSupported));
     }
 
     @Test
     public void testGetAnimals() {
-
-        RequestParamDto requestParamDto = new RequestParamDto();
-        requestParamDto.setType("dog");
+        FilterDto filterDto = new FilterDto();
+        filterDto.setType("dog");
         Sort sort = Sort.by(Sort.Direction.ASC, "name");
 
+        AnimalEntity animalEntity1 = new AnimalEntity();
+        AnimalEntity animalEntity2 = new AnimalEntity();
+        List<AnimalEntity> animalEntities = Arrays.asList(animalEntity1, animalEntity2);
+        when(animalRepository.findAll(any(Specification.class), eq(sort))).thenReturn(animalEntities);
 
-        Animal animal1 = new Animal();
-        Animal animal2 = new Animal();
-        List<Animal> animals = Arrays.asList(animal1, animal2);
-        when(animalRepository.findAll(any(Specification.class), eq(sort))).thenReturn(animals);
+        List<AnimalResponse> result = animalService.getAnimals(filterDto, sort);
 
-
-        List<Animal> result = animalService.getAnimals(requestParamDto, sort);
-
-
-        assertEquals(animals, result);
+        assertThat(result).hasSize(2);
     }
 
     @Test
     public void testGetAnimalsWithInvalidSortField() {
-
-        RequestParamDto requestParamDto = new RequestParamDto();
+        FilterDto filterDto = new FilterDto();
         Sort sort = Sort.by(Sort.Direction.ASC, "invalidField");
 
 
@@ -135,6 +107,6 @@ class AnimalServiceTest {
                 .thenThrow(new RuntimeException());
 
 
-        assertThrows(RuntimeException.class, ()-> animalService.getAnimals(requestParamDto, sort));
+        assertThrows(RuntimeException.class, ()-> animalService.getAnimals(filterDto, sort));
     }
 }
