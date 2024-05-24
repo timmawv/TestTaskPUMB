@@ -4,14 +4,13 @@ import avlyakulov.timur.TestTaskPUMB.dto.AnimalResponse;
 import avlyakulov.timur.TestTaskPUMB.dto.FilterDto;
 import avlyakulov.timur.TestTaskPUMB.entity.AnimalEntity;
 import avlyakulov.timur.TestTaskPUMB.exception.FileNotSupportedException;
+import avlyakulov.timur.TestTaskPUMB.mapper.AnimalMapper;
 import avlyakulov.timur.TestTaskPUMB.repository.AnimalRepository;
 import avlyakulov.timur.TestTaskPUMB.util.file.parser.FileParser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mapstruct.factory.Mappers;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,6 +33,9 @@ class AnimalServiceTest {
     @Mock
     private FileParser fileParser;
 
+    @Spy
+    private AnimalMapper animalMapper = Mappers.getMapper(AnimalMapper.class);
+
     @Captor
     ArgumentCaptor<List<AnimalEntity>> animalCaptor;
 
@@ -49,6 +51,7 @@ class AnimalServiceTest {
 
     private List<AnimalEntity> listOfXmlFileAnimal = List.of(new AnimalEntity("Milo", "cat", "male", 40, 51, 3),
             new AnimalEntity("Simon", "dog", "male", 45, 17, 1));
+
 
     @Test
     void parseFile_parseCsvFile() {
@@ -87,13 +90,10 @@ class AnimalServiceTest {
         filterDto.setType("dog");
         Sort sort = Sort.by(Sort.Direction.ASC, "name");
 
-        AnimalEntity animalEntity1 = new AnimalEntity();
-        AnimalEntity animalEntity2 = new AnimalEntity();
-        List<AnimalEntity> animalEntities = Arrays.asList(animalEntity1, animalEntity2);
-        when(animalRepository.findAll(any(Specification.class), eq(sort))).thenReturn(animalEntities);
+        List<AnimalEntity> animalEntities = Arrays.asList(new AnimalEntity(), new AnimalEntity());
+        doReturn(animalEntities).when(animalRepository).findAll(any(Specification.class), eq(sort));
 
         List<AnimalResponse> result = animalService.getAnimals(filterDto, sort);
-
         assertThat(result).hasSize(2);
     }
 
@@ -107,6 +107,6 @@ class AnimalServiceTest {
                 .thenThrow(new RuntimeException());
 
 
-        assertThrows(RuntimeException.class, ()-> animalService.getAnimals(filterDto, sort));
+        assertThrows(RuntimeException.class, () -> animalService.getAnimals(filterDto, sort));
     }
 }

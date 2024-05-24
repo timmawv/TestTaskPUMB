@@ -14,7 +14,6 @@ import avlyakulov.timur.TestTaskPUMB.util.file.FileUtil;
 import avlyakulov.timur.TestTaskPUMB.util.file.parser.FileParser;
 import avlyakulov.timur.TestTaskPUMB.util.specification.SpecificationContextUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
@@ -35,20 +34,22 @@ public class AnimalService {
 
     private final FileParser xmlParser;
 
+    private final AnimalMapper animalMapper;
+
     @Autowired
-    public AnimalService(AnimalRepository animalRepository, @Qualifier("csvParser") FileParser csvParser, @Qualifier("xmlParser") FileParser xmlParser) {
+    public AnimalService(AnimalRepository animalRepository, @Qualifier("csvParser") FileParser csvParser, @Qualifier("xmlParser") FileParser xmlParser, AnimalMapper animalMapper) {
         this.animalRepository = animalRepository;
         this.csvParser = csvParser;
         this.xmlParser = xmlParser;
+        this.animalMapper = animalMapper;
     }
-
-    private final AnimalMapper animalMapper = Mappers.getMapper(AnimalMapper.class);
 
     public List<AnimalResponse> getAnimals(FilterDto filterDto, Sort sort) {
         Specification<AnimalEntity> animalSpecification = configureSpecificationWithDto(filterDto);
         try {
             List<AnimalEntity> animals = animalRepository.findAll(animalSpecification, sort);
-            return animalMapper.mapListAnimalToListAnimalResponse(animals);
+            List<AnimalResponse> animalResponses = animalMapper.mapListAnimalToListAnimalResponse(animals);
+            return animalResponses;
         } catch (PropertyReferenceException ex) {
             throw new FieldSortException(ex.getMessage());
         }

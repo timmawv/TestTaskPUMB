@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiMessageResponse> handleMaxSizeException() {
-        return ResponseEntity.badRequest().body(new ApiMessageResponse("You file is too large. Max upload size is " + maxUploadSize));
+        return ResponseEntity.badRequest().body(new ApiMessageResponse("Your file is too large. Max upload size is " + maxUploadSize));
     }
 
     @ExceptionHandler(MissingServletRequestPartException.class)

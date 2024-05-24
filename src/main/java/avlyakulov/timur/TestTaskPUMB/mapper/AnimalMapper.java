@@ -11,6 +11,8 @@ import java.util.List;
 @Mapper
 public interface AnimalMapper {
 
+    AnimalResponse mapAnimalEntityToAnimalResponse(AnimalEntity animal);
+
     List<AnimalEntity> mapListCSVtoListAnimal(List<AnimalRequestCSV> listAnimalCSV);
 
     List<AnimalEntity> mapListXMLtoListAnimal(List<AnimalXML> listAnimalXML);
