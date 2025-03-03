@@ -14,12 +14,10 @@
     <groupId>avlyakulov.timur</groupId>
     <artifactId>TestTaskPUMB</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>TestTaskPUMB</name>
-    <description>Test task for Pumb</description>
 
     <properties>
-        <java.version>17</java.version>
-        <lombok.version>1.18.24</lombok.version>
+        <java.version>21</java.version>
+        <lombok.version>1.18.34</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <swagger.version>2.5.0</swagger.version>
     </properties>

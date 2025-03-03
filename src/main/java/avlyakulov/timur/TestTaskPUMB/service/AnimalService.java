@@ -60,7 +60,8 @@ public class AnimalService {
         animalEntities = validateAnimalsByParameters(animalEntities);
         setCategoryToAnimal(animalEntities);
         List<AnimalEntity> animals = animalRepository.saveAll(animalEntities);
-        return animalMapper.mapListAnimalToListAnimalResponse(animals);
+        List<AnimalResponse> animalResponses = animalMapper.mapListAnimalToListAnimalResponse(animals);
+        return animalResponses;
     }
 
     private List<AnimalEntity> parseFileToAnimalEntities(MultipartFile file) {
