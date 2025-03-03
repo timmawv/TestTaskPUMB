@@ -48,8 +48,7 @@ public class AnimalService {
         Specification<AnimalEntity> animalSpecification = configureSpecificationWithDto(filterDto);
         try {
             List<AnimalEntity> animals = animalRepository.findAll(animalSpecification, sort);
-            List<AnimalResponse> animalResponses = animalMapper.mapListAnimalToListAnimalResponse(animals);
-            return animalResponses;
+            return animalMapper.mapListAnimalToListAnimalResponse(animals);
         } catch (PropertyReferenceException ex) {
             throw new FieldSortException(ex.getMessage());
         }
@@ -60,8 +59,7 @@ public class AnimalService {
         animalEntities = validateAnimalsByParameters(animalEntities);
         setCategoryToAnimal(animalEntities);
         List<AnimalEntity> animals = animalRepository.saveAll(animalEntities);
-        List<AnimalResponse> animalResponses = animalMapper.mapListAnimalToListAnimalResponse(animals);
-        return animalResponses;
+        return animalMapper.mapListAnimalToListAnimalResponse(animals);
     }
 
     private List<AnimalEntity> parseFileToAnimalEntities(MultipartFile file) {
