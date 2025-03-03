@@ -51,13 +51,17 @@ class AnimalServiceTest {
 
     private final String csvFileContent = " ";
 
-    private List<AnimalEntity> listOfCsvFileAnimal = List.of(new AnimalEntity("Buddy", "cat", "female", 41, 78, 4),
-            new AnimalEntity("Duke", "cat", "male", 33, 108, 4));
+    private final List<AnimalEntity> listOfCsvFileAnimal = List.of(
+            new AnimalEntity("Buddy", "cat", "female", 41, 78, 4),
+            new AnimalEntity("Duke", "cat", "male", 33, 108, 4)
+    );
 
     private final String xmlFileContent = " ";
 
-    private List<AnimalEntity> listOfXmlFileAnimal = List.of(new AnimalEntity("Milo", "cat", "male", 40, 51, 3),
-            new AnimalEntity("Simon", "dog", "male", 45, 17, 1));
+    private final List<AnimalEntity> listOfXmlFileAnimal = List.of(
+            new AnimalEntity("Milo", "cat", "male", 40, 51, 3),
+            new AnimalEntity("Simon", "dog", "male", 45, 17, 1)
+    );
 
 
     @Test
@@ -73,7 +77,6 @@ class AnimalServiceTest {
     }
 
 
-    //todo Пересмотреть как тут отрабаыватет маппер, почему так, почему null и прочее.
     @Test
     void parseFile_parseXmlFile() {
         MultipartFile fileXml = new MockMultipartFile("animal", "animal.xml", "text/xml", xmlFileContent.getBytes());
@@ -110,7 +113,6 @@ class AnimalServiceTest {
     public void testGetAnimalsWithInvalidSortField() {
         FilterDto filterDto = new FilterDto();
         Sort sort = Sort.by(Sort.Direction.ASC, "invalidField");
-
 
         when(animalRepository.findAll(any(Specification.class), eq(sort)))
                 .thenThrow(new RuntimeException());
