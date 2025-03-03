@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: TestTaskPUMB
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DB_URL:jdbc:postgresql://localhost:5432/animals_db}
@@ -8,7 +6,7 @@ spring:
     password: postgres
   liquibase:
     change-log: db/changelog/main-changelog.xml
-    enabled: true
+    enabled: false
   servlet:
     multipart:
       max-file-size: 3MB
